@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.ViewModels.Exercise
 {
-    public class ExerciseOverviewItemViewModel
+    public class UpdateExerciseViewModel : CreateExerciseViewModel
     {
         public Guid Id { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public IEnumerable<string>? Attachments { get; set; }
     }
 }

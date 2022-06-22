@@ -31,10 +31,15 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm]CreateExerciseViewModel exercise)
+        public Task<Guid> Create([FromForm]CreateExerciseViewModel exercise)
         {
-            await exerciseManager.Create(exercise);
-            return NoContent();
+            return exerciseManager.Create(exercise);
+        }
+
+        [HttpPut]
+        public Task<Guid> Update([FromForm] UpdateExerciseViewModel exercise)
+        {
+            return exerciseManager.Update(exercise);
         }
 
         [HttpDelete]

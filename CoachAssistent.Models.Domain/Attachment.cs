@@ -18,6 +18,6 @@ namespace CoachAssistent.Models.Domain
         public string FilePath { get; set; }
 
         public Guid? ExerciseId { get; set; }
-        public Exercise Exercise { get; set; }
+        public Exercise? Exercise { get; set; }
     }
 }

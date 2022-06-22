@@ -16,9 +16,9 @@ namespace CoachAssistent.Api.Controllers
             attachmentManager = new AttachmentManager(context, mapper, configuration);
         }
         [HttpGet]
-        public Task<byte[]> GetAttachment(Guid id)
+        public async Task<FileContentResult> GetAttachment(Guid id)
         {
-            return attachmentManager.GetAttachment(id);
+            return File(await attachmentManager.GetAttachment(id), "image/png");
         }
     }
 }
