@@ -30,14 +30,20 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSegment(SegmentViewModel segment)
+        public Task<Guid> Create(SegmentViewModel segment)
         {
-            await segmentManager.Create(segment);
+            return segmentManager.Create(segment);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update(SegmentViewModel segment)
+        {
+            await segmentManager.Update(segment);
             return NoContent();
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteSegment(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             await segmentManager.Delete(id);
             return NoContent();

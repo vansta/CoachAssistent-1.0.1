@@ -29,12 +29,12 @@ namespace CoachAssistent.Managers
         public async Task<SegmentViewModel> GetSegment(Guid id)
         {
             Segment? segemnt = await dbContext.Segments
-                .Include(s => s.Exercises)
+                .Include(s => s.Exercises).ThenInclude(e => e.Attachments)
                 .SingleAsync(s => s.Id.Equals(id));
             return mapper.Map<SegmentViewModel>(segemnt);
         }
 
-        public async Task Create(SegmentViewModel viewModel)
+        public async Task<Guid> Create(SegmentViewModel viewModel)
         {
             IQueryable<Exercise> exercises = dbContext
                 .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id));
@@ -44,7 +44,24 @@ namespace CoachAssistent.Managers
                 Description = viewModel.Description,
                 Exercises = exercises.ToHashSet()
             };
-            await dbContext.Segments.AddAsync(segment);
+            segment = (await dbContext.Segments.AddAsync(segment)).Entity;
+            await dbContext.SaveChangesAsync();
+
+            return segment.Id;
+        }
+
+        public async Task Update(SegmentViewModel viewModel)
+        {
+            Segment segment = await dbContext.Segments
+                .Include(s => s.Exercises)
+                .SingleAsync(s => s.Id.Equals(viewModel.Id));
+
+            segment.Name = viewModel.Name;
+            segment.Description = viewModel.Description;
+
+            segment.Exercises = dbContext
+                .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
+
             await dbContext.SaveChangesAsync();
         }
 
