@@ -18,5 +18,27 @@ namespace CoachAssistent.Data
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Training> Trainings => Set<Training>();
         public DbSet<User> Users => Set<User>();
+        public DbSet<SharablesXGroups> SharablesXGroups => Set<SharablesXGroups>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<Segment>()
+                .HasMany(e => e.Exercises)
+                .WithMany(u => u.Segments)
+                .UsingEntity<SegmentXExercise>();
+
+            modelBuilder
+                .Entity<SegmentXExercise>()
+                .HasOne(se => se.Segment)
+                .WithMany(s => s.SegmentsXExercises)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder
+                .Entity<SegmentXExercise>()
+                .HasOne(se => se.Exercise)
+                .WithMany(s => s.SegmentsXExercises)
+                .OnDelete(DeleteBehavior.NoAction);
+        }
     }
 }

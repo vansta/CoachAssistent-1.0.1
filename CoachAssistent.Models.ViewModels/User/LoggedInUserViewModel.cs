@@ -10,10 +10,12 @@ namespace CoachAssistent.Models.ViewModels.User
     {
         public LoggedInUserViewModel()
         {
-            UserName = string.Empty;
+            GroupIds = new List<Guid>();
         }
-        public Guid Id { get; set; }
-        public string UserName { get; set; }
+        public Guid? Id { get; set; }
+        public string? UserName { get; set; }
         public string? Email { get; set; }
+
+        public IEnumerable<Guid> GroupIds { get; set; }
     }
 }

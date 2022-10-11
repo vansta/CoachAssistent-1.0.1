@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
+using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Segment;
@@ -7,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoachAssistent.Managers
 {
-    public class SegmentManager : BaseManager
+    public class SegmentManager : BaseAuthenticatedManager
     {
-        public SegmentManager(CoachAssistentDbContext context, IMapper mapper)
-            : base(context, mapper)
+        public SegmentManager(CoachAssistentDbContext context, IMapper mapper, IAuthenticationWrapper authenticationWrapper)
+            : base(context, mapper, authenticationWrapper)
         {
 
         }
@@ -18,6 +19,7 @@ namespace CoachAssistent.Managers
         {
             IQueryable<Segment> segments = dbContext.Segments
                 .Include(s => s.Exercises);
+            segments = FilterBySharingLevel(segments);
             return new OverviewViewModel<SegmentOverviewItemViewModel>
             {
                 Items = segments

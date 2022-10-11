@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
+using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels.User;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,12 @@ namespace CoachAssistent.Managers
 {
     public class AccountManager : BaseManager
     {
-        readonly IConfiguration configuration;
+        //readonly IConfiguration configuration;
+        readonly JwtHelper jwtHelper;
         public AccountManager(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration) : base(dbContext, mapper)
         {
-            this.configuration = configuration;
+            //this.configuration = configuration;
+            jwtHelper = new JwtHelper(configuration);
         }
 
         public async Task<string> Register(RegisterViewModel registerData)
@@ -32,13 +35,13 @@ namespace CoachAssistent.Managers
             }
 
             LoggedInUserViewModel user = await CreateUser(registerData);
-            return GenerateJwt(user);
+            return jwtHelper.GenerateJwt(user);
         }
 
         public async Task<string> Login(CredentialsViewModel credentials)
         {
             LoggedInUserViewModel user = await Authenticate(credentials);
-            return GenerateJwt(user);
+            return jwtHelper.GenerateJwt(user);
         }
 
         private async Task<LoggedInUserViewModel> CreateUser(RegisterViewModel registerData)
@@ -63,29 +66,6 @@ namespace CoachAssistent.Managers
             await dbContext.SaveChangesAsync();
 
             return mapper.Map<LoggedInUserViewModel>(user);
-        }
-
-        private string GenerateJwt(LoggedInUserViewModel user)
-        {
-            IConfigurationSection jwtSection = configuration.GetSection("Jwt");
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSection["Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email ?? "")
-            };
-
-            JwtSecurityToken jwt = new JwtSecurityToken(
-                issuer: jwtSection["Issuer"],
-                audience: jwtSection["Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(8),
-                signingCredentials: credentials);
-
-            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
 
         private async Task<LoggedInUserViewModel> Authenticate(CredentialsViewModel credentials)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoachAssistent.Common.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.Domain
 {
-    public class Exercise
+    public class Exercise : ISharable
     {
         public Exercise()
         {
@@ -15,19 +16,23 @@ namespace CoachAssistent.Models.Domain
             Attachments = new HashSet<Attachment>();
             Tags = new HashSet<Tag>();
             Segments = new HashSet<Segment>();
+            SharablesXGroups = new HashSet<SharablesXGroups>();
+            SegmentsXExercises = new HashSet<SegmentXExercise>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
         public string Name { get; set; }
         public string? Description { get; set; }
 
-        public bool Public { get; set; }
+        public SharingLevel Shared { get; set; }
 
-        public Guid? UserId { get; set; }
+        public Guid UserId { get; set; }
         public User? User { get; set; }
 
         public ICollection<Attachment> Attachments { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public ICollection<Segment> Segments { get; set; }
+        public ICollection<SharablesXGroups> SharablesXGroups { get; set; }
+        public ICollection<SegmentXExercise> SegmentsXExercises { get; set; }
     }
 }

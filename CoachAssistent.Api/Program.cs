@@ -1,8 +1,13 @@
 using CoachAssistent.AutomapperBootstrapper;
 using CoachAssistent.AutomapperBootstrapper.Profiles;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using CoachAssistent.Managers.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+JwtHelper jwtHelper = new(builder.Configuration);
+
 
 // Add services to the container.
 builder.Services.AddCors(options => options.AddDefaultPolicy(cfg => cfg.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
@@ -16,6 +21,16 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<CoachAssistent.Data.CoachAssistentDbContext>(
     options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
 
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
+        options =>
+        {
+            options.TokenValidationParameters = jwtHelper.TokenValidationParameters;
+        });
+
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -27,6 +42,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

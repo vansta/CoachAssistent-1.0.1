@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CoachAssistent.Common\CoachAssistent.Common.csproj" />
+  </ItemGroup>
+
 </Project>

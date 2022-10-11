@@ -21,5 +21,6 @@ namespace CoachAssistent.Models.ViewModels.User
         public string? LastName { get; set; }
         [Required]
         public string PasswordHash { get; set; }
+        public IEnumerable<Guid>? GroupIds { get; set; }
     }
 }

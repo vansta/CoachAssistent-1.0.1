@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
 using CoachAssistent.Managers;
+using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Exercise;
 using Microsoft.AspNetCore.Http;
@@ -13,9 +14,11 @@ namespace CoachAssistent.Api.Controllers
     public class ExerciseController : ControllerBase
     {
         readonly ExerciseManager exerciseManager;
-        public ExerciseController(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration)
+        readonly IAuthenticationWrapper authenticationWrapper;
+        public ExerciseController(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            exerciseManager = new ExerciseManager(dbContext, mapper, configuration);
+            authenticationWrapper = new AuthenticationWrapper(httpContextAccessor);
+            exerciseManager = new ExerciseManager(dbContext, mapper, configuration, authenticationWrapper);
         }
 
         [HttpGet]

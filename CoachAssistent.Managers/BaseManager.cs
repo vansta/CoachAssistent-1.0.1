@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using CoachAssistent.Common;
+using CoachAssistent.Common.Enums;
 using CoachAssistent.Data;
+using CoachAssistent.Models.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;

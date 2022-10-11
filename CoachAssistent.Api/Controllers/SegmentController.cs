@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
 using CoachAssistent.Managers;
+using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Segment;
 using Microsoft.AspNetCore.Http;
@@ -13,9 +14,10 @@ namespace CoachAssistent.Api.Controllers
     public class SegmentController : ControllerBase
     {
         readonly SegmentManager segmentManager;
-        public SegmentController(CoachAssistentDbContext context, IMapper mapper)
+        public SegmentController(CoachAssistentDbContext context, IMapper mapper, IHttpContextAccessor contextAccessor)
         {
-            segmentManager = new SegmentManager(context, mapper);
+            IAuthenticationWrapper authenticationWrapper = new AuthenticationWrapper(contextAccessor);
+            segmentManager = new SegmentManager(context, mapper, authenticationWrapper);
         }
         [HttpGet]
         public Task<SegmentViewModel> GetSegment(Guid id)

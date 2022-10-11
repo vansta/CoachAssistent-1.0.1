@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
+using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Exercise;
@@ -8,11 +9,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace CoachAssistent.Managers
 {
-    public class ExerciseManager : BaseManager
+    public class ExerciseManager : BaseAuthenticatedManager
     {
         readonly IConfiguration configuration;
-        public ExerciseManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration) 
-            : base(context, mapper)
+        
+        public ExerciseManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) 
+            : base(context, mapper, authenticationWrapper)
         {
             this.configuration = configuration;
         }
@@ -20,6 +22,10 @@ namespace CoachAssistent.Managers
         {
             IQueryable<Exercise> exercises = dbContext.Exercises
                 .Include(e => e.Attachments);
+
+            exercises = FilterBySharingLevel(exercises);
+
+            var test = exercises.ToList();
 
             return new OverviewViewModel<ExerciseOverviewItemViewModel>
             {
@@ -39,7 +45,9 @@ namespace CoachAssistent.Managers
             Exercise exercise = new()
             {
                 Name = viewModel.Name,
-                Description = viewModel.Description
+                Description = viewModel.Description,
+                Shared = Common.Enums.SharingLevel.Public,
+                UserId = authenticationWrapper.UserId
             };
 
             exercise = (await dbContext.Exercises.AddAsync(exercise)).Entity;
@@ -68,12 +76,12 @@ namespace CoachAssistent.Managers
             Directory.CreateDirectory(basePath);
 
             var filesToRemove = exercise.Attachments.Where(a => !viewModel.Attachments.Any(x => x.FileName.Equals(a.FilePath)));
-            foreach(var attachment in filesToRemove)
+            foreach (var attachment in filesToRemove)
             {
                 AttachmentManager.RemoveAttachment(basePath, attachment.FilePath);
                 exercise.Attachments.Remove(attachment);
             }
-            
+
             foreach (var file in viewModel.Attachments)
             {
                 Attachment attachment = AttachmentManager.CreateAttachment(basePath, file);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CoachAssistent.Common.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace CoachAssistent.Models.ViewModels.Exercise
         public string Name { get; set; }
         public string? Description { get; set; }
 
-        public bool Public { get; set; }
+        public SharingLevel Shared { get; set; }
 
         public ICollection<IFormFile> Attachments { get; set; }
         public ICollection<SelectViewModel> Tags { get; set; }
