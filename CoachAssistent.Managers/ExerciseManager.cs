@@ -4,6 +4,7 @@ using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Exercise;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -40,7 +41,7 @@ namespace CoachAssistent.Managers
             return mapper.Map<ExerciseOverviewItemViewModel>(exercise);
         }
 
-        public async Task<Guid> Create(CreateExerciseViewModel viewModel)
+        public Task<Guid> Create(CreateExerciseViewModel viewModel)
         {
             Exercise exercise = new()
             {
@@ -50,17 +51,52 @@ namespace CoachAssistent.Managers
                 UserId = authenticationWrapper.UserId
             };
 
+            return Create(exercise, viewModel.Attachments);
+        }
+
+        public async Task<Guid> Create(Exercise exercise, ICollection<IFormFile> attachments)
+        {
             exercise = (await dbContext.Exercises.AddAsync(exercise)).Entity;
 
             string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
             Directory.CreateDirectory(basePath);
-            foreach (var file in viewModel.Attachments)
+            foreach (var file in attachments)
             {
                 exercise.Attachments.Add(AttachmentManager.CreateAttachment(basePath, file));
             }
             await dbContext.SaveChangesAsync();
 
             return exercise.Id;
+        }
+
+        public async Task<Guid> UpdateOrCopy(UpdateExerciseViewModel viewModel)
+        {
+            Exercise? exercise = await dbContext.Exercises
+                .Include(e => e.Attachments)
+                .SingleAsync(e => e.Id.Equals(viewModel.Id));
+
+            if (exercise.UserId == authenticationWrapper.UserId)
+            {
+                return await Update(viewModel);
+            }
+            else
+            {
+                return await Copy(exercise, viewModel);
+            }
+        }
+
+        private Task<Guid> Copy(Exercise exercise, UpdateExerciseViewModel viewModel)
+        {
+            Exercise copy = new()
+            {
+                UserId = authenticationWrapper.UserId,
+                Name = viewModel.Name,
+                Description = viewModel.Description,
+                Shared = Common.Enums.SharingLevel.Private,
+                OriginalId = exercise.Id,
+                OriginalVersion = exercise.OriginalVersion
+            };
+            return Create(copy, viewModel.Attachments);
         }
 
         public async Task<Guid> Update(UpdateExerciseViewModel viewModel)
@@ -71,6 +107,7 @@ namespace CoachAssistent.Managers
 
             exercise.Name = viewModel.Name;
             exercise.Description = viewModel.Description;
+            exercise.Version++;
 
             string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
             Directory.CreateDirectory(basePath);
@@ -103,11 +140,14 @@ namespace CoachAssistent.Managers
 
             if (exercise is not null)
             {
-                string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
-                Directory.CreateDirectory(basePath);
-                AttachmentManager.RemoveAttachmentsRange(basePath, exercise.Attachments.Select(a => a.Name));
+                //string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
+                //Directory.CreateDirectory(basePath);
+                //AttachmentManager.RemoveAttachmentsRange(basePath, exercise.Attachments.Select(a => a.Name));
 
-                dbContext.Exercises.Remove(exercise);
+                //dbContext.Exercises.Remove(exercise);
+
+                exercise.DeletedTS = DateTime.Now;
+
                 await dbContext.SaveChangesAsync();
             }
         }

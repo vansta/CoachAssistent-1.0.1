@@ -24,6 +24,11 @@ namespace CoachAssistent.Models.Domain
         public string? Description { get; set; }
 
         public SharingLevel Shared { get; set; }
+        public int Version { get; set; }
+        public Guid? OriginalId { get; set; }
+        public int OriginalVersion { get; set; }
+
+        public DateTime? DeletedTS { get; set; }
 
         public Guid UserId { get; set; }
         public User? User { get; set; }

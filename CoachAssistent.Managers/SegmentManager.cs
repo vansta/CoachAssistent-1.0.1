@@ -44,7 +44,8 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                Exercises = exercises.ToHashSet()
+                Exercises = exercises.ToHashSet(),
+                UserId = authenticationWrapper.UserId
             };
             segment = (await dbContext.Segments.AddAsync(segment)).Entity;
             await dbContext.SaveChangesAsync();
@@ -72,7 +73,8 @@ namespace CoachAssistent.Managers
             Segment? segment = await dbContext.Segments.FindAsync(id);
             if (segment is not null)
             {
-                dbContext.Segments.Remove(segment);
+                //dbContext.Segments.Remove(segment);
+                segment.DeletedTS = DateTime.Now;
                 await dbContext.SaveChangesAsync();
             }
         }

@@ -4,6 +4,7 @@ using CoachAssistent.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    partial class CoachAssistentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221012071745_Version")]
+    partial class Version
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,9 +56,6 @@ namespace CoachAssistent.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("DeletedTS")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -81,8 +80,6 @@ namespace CoachAssistent.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OriginalId");
 
                     b.HasIndex("UserId");
 
@@ -114,9 +111,6 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("DeletedTS")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -243,9 +237,6 @@ namespace CoachAssistent.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("DeletedTS")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -344,17 +335,11 @@ namespace CoachAssistent.Data.Migrations
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Exercise", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Exercise", "Original")
-                        .WithMany()
-                        .HasForeignKey("OriginalId");
-
                     b.HasOne("CoachAssistent.Models.Domain.User", "User")
                         .WithMany("Exercises")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Original");
 
                     b.Navigation("User");
                 });
@@ -400,7 +385,7 @@ namespace CoachAssistent.Data.Migrations
                         .HasForeignKey("ExerciseId");
 
                     b.HasOne("CoachAssistent.Models.Domain.Group", "Group")
-                        .WithMany("SharablesXGroups")
+                        .WithMany()
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -480,8 +465,6 @@ namespace CoachAssistent.Data.Migrations
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Group", b =>
                 {
-                    b.Navigation("SharablesXGroups");
-
                     b.Navigation("Tags");
                 });
 
