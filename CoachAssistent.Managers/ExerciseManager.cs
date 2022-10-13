@@ -48,10 +48,11 @@ namespace CoachAssistent.Managers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Shared = Common.Enums.SharingLevel.Public,
-                UserId = authenticationWrapper.UserId
+                UserId = authenticationWrapper.UserId,
+                VersionTS = DateTime.Now
             };
 
-            return Create(exercise, viewModel.Attachments);
+            return Create(exercise, viewModel.AddedAttachments);
         }
 
         public async Task<Guid> Create(Exercise exercise, ICollection<IFormFile> attachments)
@@ -85,7 +86,7 @@ namespace CoachAssistent.Managers
             }
         }
 
-        private Task<Guid> Copy(Exercise exercise, UpdateExerciseViewModel viewModel)
+        private async Task<Guid> Copy(Exercise exercise, UpdateExerciseViewModel viewModel)
         {
             Exercise copy = new()
             {
@@ -93,10 +94,22 @@ namespace CoachAssistent.Managers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Shared = Common.Enums.SharingLevel.Private,
+                VersionTS = DateTime.Now,
                 OriginalId = exercise.Id,
-                OriginalVersion = exercise.OriginalVersion
+                OriginalVersionTS = exercise.OriginalVersionTS
             };
-            return Create(copy, viewModel.Attachments);
+
+            Guid newId = await Create(copy, viewModel.AddedAttachments);
+
+            foreach (var attachmentId in viewModel.SelectedAttachments)
+            {
+                Attachment? originalAttachment = await dbContext.Attachments.SingleAsync(a => a.Id == attachmentId);
+                string fromBasePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
+                string toBasePath = Path.Combine(configuration["AttachmentFolder"], newId.ToString());
+                AttachmentManager.CopyAttachment(fromBasePath, toBasePath, originalAttachment);
+            }
+
+            return newId;
         }
 
         public async Task<Guid> Update(UpdateExerciseViewModel viewModel)
@@ -107,19 +120,19 @@ namespace CoachAssistent.Managers
 
             exercise.Name = viewModel.Name;
             exercise.Description = viewModel.Description;
-            exercise.Version++;
+            exercise.VersionTS = DateTime.Now;
 
             string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
             Directory.CreateDirectory(basePath);
 
-            var filesToRemove = exercise.Attachments.Where(a => !viewModel.Attachments.Any(x => x.FileName.Equals(a.FilePath)));
+            var filesToRemove = exercise.Attachments.Where(a => !viewModel.SelectedAttachments.Any(x => x == a.Id));
             foreach (var attachment in filesToRemove)
             {
                 AttachmentManager.RemoveAttachment(basePath, attachment.FilePath);
                 exercise.Attachments.Remove(attachment);
             }
 
-            foreach (var file in viewModel.Attachments)
+            foreach (var file in viewModel.AddedAttachments)
             {
                 Attachment attachment = AttachmentManager.CreateAttachment(basePath, file);
                 if (!exercise.Attachments.Any(x => x.FilePath.Equals(file.FileName)))

@@ -45,7 +45,8 @@ namespace CoachAssistent.Managers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Exercises = exercises.ToHashSet(),
-                UserId = authenticationWrapper.UserId
+                UserId = authenticationWrapper.UserId,
+                VersionTS = DateTime.Now
             };
             segment = (await dbContext.Segments.AddAsync(segment)).Entity;
             await dbContext.SaveChangesAsync();
@@ -61,6 +62,8 @@ namespace CoachAssistent.Managers
 
             segment.Name = viewModel.Name;
             segment.Description = viewModel.Description;
+
+            segment.VersionTS = DateTime.Now;
 
             segment.Exercises = dbContext
                 .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();

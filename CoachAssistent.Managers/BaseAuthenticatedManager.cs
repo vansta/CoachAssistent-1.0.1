@@ -21,16 +21,17 @@ namespace CoachAssistent.Managers
 
         public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : ISharable
         {
-            collection = collection.Where(c => !c.DeletedTS.HasValue);
+            collection = collection
+                .Where(c => !c.DeletedTS.HasValue);
             if (!authenticationWrapper.IsLoggedIn)
             {
-                return collection.Where(c => c.Shared == SharingLevel.Public);
+                collection = collection.Where(c => c.Shared == SharingLevel.Public);
             }
             else
             {
                 Guid userId = authenticationWrapper.UserId;
                 IEnumerable<Guid> groupIds = authenticationWrapper.User.GroupIds;
-                return collection
+                collection = collection
                     .Where(c =>
                         //public
                         (c.Shared == SharingLevel.Public)
@@ -45,6 +46,8 @@ namespace CoachAssistent.Managers
                         )
                     );
             }
+
+            return collection;
         }
     }
 }

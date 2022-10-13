@@ -47,6 +47,11 @@ namespace CoachAssistent.Managers
             };
         }
 
+        internal static void CopyAttachment(string fromPath, string toPath, Attachment attachment)
+        {
+            File.Copy(Path.Combine(fromPath, attachment.FilePath), Path.Combine(toPath, attachment.FilePath));
+        }
+
         internal static void RemoveAttachmentsRange(string basePath, IEnumerable<string> fileNames)
         {
             foreach (var fileName in fileNames)

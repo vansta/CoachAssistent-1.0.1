@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    [Migration("20221013060904_InitialCreate")]
+    [Migration("20221013122107_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,8 +70,8 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid?>("OriginalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("OriginalVersion")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("OriginalVersionTS")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Shared")
                         .HasColumnType("int");
@@ -79,8 +79,8 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("VersionTS")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -131,8 +131,8 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid?>("OriginalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("OriginalVersion")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("OriginalVersionTS")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Shared")
                         .HasColumnType("int");
@@ -140,8 +140,8 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("VersionTS")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -257,8 +257,8 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid?>("OriginalId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("OriginalVersion")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("OriginalVersionTS")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Shared")
                         .HasColumnType("int");
@@ -266,8 +266,8 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("VersionTS")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
