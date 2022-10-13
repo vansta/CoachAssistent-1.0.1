@@ -71,6 +71,9 @@ namespace CoachAssistent.Managers
             training.Name = viewModel.Name;
             training.Description = viewModel.Description;
 
+            training.Segments = dbContext
+                .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
+
             //training.Exercises = dbContext
             //    .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
 
