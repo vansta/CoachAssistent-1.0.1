@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.Domain
 {
-    public class SegmentXExercise
+    public class TrainingXSegment
     {
+        public Guid TrainingId { get; set; }
         public Guid SegmentId { get; set; }
-        public Guid ExerciseId { get; set; }
 
         public int Index { get; set; }
 
+        public Training? Training { get; set; }
         public Segment? Segment { get; set; }
-        public Exercise? Exercise { get; set; }
     }
 }

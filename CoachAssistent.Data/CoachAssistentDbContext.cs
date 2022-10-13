@@ -19,6 +19,8 @@ namespace CoachAssistent.Data
         public DbSet<Training> Trainings => Set<Training>();
         public DbSet<User> Users => Set<User>();
         public DbSet<SharablesXGroups> SharablesXGroups => Set<SharablesXGroups>();
+        public DbSet<SegmentXExercise> SegmentsXExercises => Set<SegmentXExercise>();
+        public DbSet<TrainingXSegment> TrainingsXSegments => Set<TrainingXSegment>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +40,24 @@ namespace CoachAssistent.Data
                 .Entity<SegmentXExercise>()
                 .HasOne(se => se.Exercise)
                 .WithMany(s => s.SegmentsXExercises)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder
+                .Entity<Segment>()
+                .HasMany(e => e.Trainings)
+                .WithMany(u => u.Segments)
+                .UsingEntity<TrainingXSegment>();
+
+            modelBuilder
+                .Entity<TrainingXSegment>()
+                .HasOne(se => se.Segment)
+                .WithMany(s => s.TrainingsXSegments)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder
+                .Entity<TrainingXSegment>()
+                .HasOne(se => se.Training)
+                .WithMany(s => s.TrainingsXSegments)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

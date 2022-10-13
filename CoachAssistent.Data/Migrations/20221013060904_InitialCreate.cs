@@ -49,11 +49,20 @@ namespace CoachAssistent.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Shared = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<int>(type: "int", nullable: false),
+                    OriginalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OriginalVersion = table.Column<int>(type: "int", nullable: false),
+                    DeletedTS = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Exercises", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Exercises_Exercises_OriginalId",
+                        column: x => x.OriginalId,
+                        principalTable: "Exercises",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Exercises_Users_UserId",
                         column: x => x.UserId,
@@ -87,6 +96,31 @@ namespace CoachAssistent.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Segments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Shared = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<int>(type: "int", nullable: false),
+                    OriginalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OriginalVersion = table.Column<int>(type: "int", nullable: false),
+                    DeletedTS = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Segments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Segments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Trainings",
                 columns: table => new
                 {
@@ -94,6 +128,10 @@ namespace CoachAssistent.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Shared = table.Column<int>(type: "int", nullable: false),
+                    Version = table.Column<int>(type: "int", nullable: false),
+                    OriginalId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    OriginalVersion = table.Column<int>(type: "int", nullable: false),
+                    DeletedTS = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -127,49 +165,23 @@ namespace CoachAssistent.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Segments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Shared = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TrainingId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Segments", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Segments_Trainings_TrainingId",
-                        column: x => x.TrainingId,
-                        principalTable: "Trainings",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Segments_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SegmentXExercise",
+                name: "SegmentsXExercises",
                 columns: table => new
                 {
                     SegmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExerciseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ExerciseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Index = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SegmentXExercise", x => new { x.ExerciseId, x.SegmentId });
+                    table.PrimaryKey("PK_SegmentsXExercises", x => new { x.ExerciseId, x.SegmentId });
                     table.ForeignKey(
-                        name: "FK_SegmentXExercise_Exercises_ExerciseId",
+                        name: "FK_SegmentsXExercises_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_SegmentXExercise_Segments_SegmentId",
+                        name: "FK_SegmentsXExercises_Segments_SegmentId",
                         column: x => x.SegmentId,
                         principalTable: "Segments",
                         principalColumn: "Id");
@@ -248,10 +260,38 @@ namespace CoachAssistent.Data.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TrainingsXSegments",
+                columns: table => new
+                {
+                    TrainingId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SegmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Index = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingsXSegments", x => new { x.SegmentId, x.TrainingId });
+                    table.ForeignKey(
+                        name: "FK_TrainingsXSegments_Segments_SegmentId",
+                        column: x => x.SegmentId,
+                        principalTable: "Segments",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_TrainingsXSegments_Trainings_TrainingId",
+                        column: x => x.TrainingId,
+                        principalTable: "Trainings",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Attachments_ExerciseId",
                 table: "Attachments",
                 column: "ExerciseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Exercises_OriginalId",
+                table: "Exercises",
+                column: "OriginalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Exercises_UserId",
@@ -264,18 +304,13 @@ namespace CoachAssistent.Data.Migrations
                 column: "UsersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Segments_TrainingId",
-                table: "Segments",
-                column: "TrainingId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Segments_UserId",
                 table: "Segments",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SegmentXExercise_SegmentId",
-                table: "SegmentXExercise",
+                name: "IX_SegmentsXExercises_SegmentId",
+                table: "SegmentsXExercises",
                 column: "SegmentId");
 
             migrationBuilder.CreateIndex(
@@ -322,6 +357,11 @@ namespace CoachAssistent.Data.Migrations
                 name: "IX_Trainings_UserId",
                 table: "Trainings",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingsXSegments_TrainingId",
+                table: "TrainingsXSegments",
+                column: "TrainingId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -333,13 +373,16 @@ namespace CoachAssistent.Data.Migrations
                 name: "GroupUser");
 
             migrationBuilder.DropTable(
-                name: "SegmentXExercise");
+                name: "SegmentsXExercises");
 
             migrationBuilder.DropTable(
                 name: "SharablesXGroups");
 
             migrationBuilder.DropTable(
                 name: "Tags");
+
+            migrationBuilder.DropTable(
+                name: "TrainingsXSegments");
 
             migrationBuilder.DropTable(
                 name: "Exercises");

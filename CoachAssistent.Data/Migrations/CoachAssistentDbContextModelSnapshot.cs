@@ -135,9 +135,6 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<int>("Shared")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("TrainingId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -145,8 +142,6 @@ namespace CoachAssistent.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TrainingId");
 
                     b.HasIndex("UserId");
 
@@ -161,11 +156,14 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid>("SegmentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
                     b.HasKey("ExerciseId", "SegmentId");
 
                     b.HasIndex("SegmentId");
 
-                    b.ToTable("SegmentXExercise");
+                    b.ToTable("SegmentsXExercises");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.SharablesXGroups", b =>
@@ -276,6 +274,24 @@ namespace CoachAssistent.Data.Migrations
                     b.ToTable("Trainings");
                 });
 
+            modelBuilder.Entity("CoachAssistent.Models.Domain.TrainingXSegment", b =>
+                {
+                    b.Property<Guid>("SegmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TrainingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
+                    b.HasKey("SegmentId", "TrainingId");
+
+                    b.HasIndex("TrainingId");
+
+                    b.ToTable("TrainingsXSegments");
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -361,10 +377,6 @@ namespace CoachAssistent.Data.Migrations
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Segment", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Training", null)
-                        .WithMany("Segments")
-                        .HasForeignKey("TrainingId");
-
                     b.HasOne("CoachAssistent.Models.Domain.User", "User")
                         .WithMany("Segments")
                         .HasForeignKey("UserId")
@@ -452,6 +464,25 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CoachAssistent.Models.Domain.TrainingXSegment", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Segment", "Segment")
+                        .WithMany("TrainingsXSegments")
+                        .HasForeignKey("SegmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Training", "Training")
+                        .WithMany("TrainingsXSegments")
+                        .HasForeignKey("TrainingId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Segment");
+
+                    b.Navigation("Training");
+                });
+
             modelBuilder.Entity("GroupUser", b =>
                 {
                     b.HasOne("CoachAssistent.Models.Domain.Group", null)
@@ -492,15 +523,17 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("SharablesXGroups");
 
                     b.Navigation("Tags");
+
+                    b.Navigation("TrainingsXSegments");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Training", b =>
                 {
-                    b.Navigation("Segments");
-
                     b.Navigation("SharablesXGroups");
 
                     b.Navigation("Tags");
+
+                    b.Navigation("TrainingsXSegments");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.User", b =>

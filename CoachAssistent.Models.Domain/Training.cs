@@ -16,6 +16,7 @@ namespace CoachAssistent.Models.Domain
             Segments = new HashSet<Segment>();
             Tags = new HashSet<Tag>();
             SharablesXGroups = new HashSet<SharablesXGroups>();
+            TrainingsXSegments = new HashSet<TrainingXSegment>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -35,5 +36,6 @@ namespace CoachAssistent.Models.Domain
         public ICollection<Segment> Segments { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public ICollection<SharablesXGroups> SharablesXGroups { get; set; }
+        public ICollection<TrainingXSegment> TrainingsXSegments { get; set; }
     }
 }
