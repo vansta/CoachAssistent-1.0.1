@@ -14,7 +14,7 @@ namespace CoachAssistent.Models.ViewModels.Exercise
         {
             Name = string.Empty;
             AddedAttachments = new HashSet<IFormFile>();
-            Tags = new HashSet<SelectViewModel>();
+            Tags = new HashSet<string>();
         }
         public string Name { get; set; }
         public string? Description { get; set; }
@@ -22,6 +22,6 @@ namespace CoachAssistent.Models.ViewModels.Exercise
         public SharingLevel Shared { get; set; }
 
         public ICollection<IFormFile> AddedAttachments { get; set; }
-        public ICollection<SelectViewModel> Tags { get; set; }
+        public ICollection<string> Tags { get; set; }
     }
 }

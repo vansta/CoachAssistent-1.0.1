@@ -14,7 +14,8 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
         public ExerciseProfile()
         {
             CreateMap<Exercise, ExerciseOverviewItemViewModel>()
-                .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments.Select(a => a.Id)));
+                .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments.Select(a => a.Id)))
+                .ForMember(dest => dest.Tags, opt => opt.MapFrom(src => src.Tags.Select(t => t.Name)));
         }
     }
 }

@@ -8,7 +8,17 @@ namespace CoachAssistent.Models.ViewModels
 {
     public class SelectViewModel
     {
-        public string? Text { get; set; }
+        public SelectViewModel(Guid id, string? title)
+        {
+            Value = id.ToString();
+            Title = title;
+        }
+        public SelectViewModel(string? value, string? title)
+        {
+            Value = value;
+            Title = title;
+        }
+        public string? Title { get; set; }
         public string? Value { get; set; }
     }
 }

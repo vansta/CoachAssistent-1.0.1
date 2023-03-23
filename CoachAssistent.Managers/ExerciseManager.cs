@@ -19,14 +19,28 @@ namespace CoachAssistent.Managers
         {
             this.configuration = configuration;
         }
-        public OverviewViewModel<ExerciseOverviewItemViewModel> GetExercises()
+        public OverviewViewModel<ExerciseOverviewItemViewModel> GetExercises(BaseSearchViewModel search)
         {
             IQueryable<Exercise> exercises = dbContext.Exercises
-                .Include(e => e.Attachments);
+                .Include(e => e.Attachments)
+                .Include(e => e.Tags);
+
+            if (search is not null)
+            {
+                if (!string.IsNullOrEmpty(search.Search))
+                {
+                    exercises = exercises
+                        .Where(e => e.Name.Contains(search.Search)
+                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
+                }
+                if (search.TagIds is not null)
+                {
+                    exercises = exercises
+                        .Where(e => e.Tags.Select(t => t.Id).Any(t => search.TagIds.Contains(t)));
+                }
+            }
 
             exercises = FilterBySharingLevel(exercises);
-
-            var test = exercises.ToList();
 
             return new OverviewViewModel<ExerciseOverviewItemViewModel>
             {
@@ -49,7 +63,10 @@ namespace CoachAssistent.Managers
                 Description = viewModel.Description,
                 Shared = Common.Enums.SharingLevel.Public,
                 UserId = authenticationWrapper.UserId,
-                VersionTS = DateTime.Now
+                VersionTS = DateTime.Now,
+                Tags = dbContext.Tags
+                    .Where(t => viewModel.Tags.Contains(t.Name))
+                    .ToHashSet()
             };
 
             return Create(exercise, viewModel.AddedAttachments);
@@ -121,6 +138,7 @@ namespace CoachAssistent.Managers
             exercise.Name = viewModel.Name;
             exercise.Description = viewModel.Description;
             exercise.VersionTS = DateTime.Now;
+            exercise.Tags = dbContext.Tags.Where(t => viewModel.Tags.Contains(t.Name)).ToHashSet();
 
             string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
             Directory.CreateDirectory(basePath);
@@ -153,12 +171,6 @@ namespace CoachAssistent.Managers
 
             if (exercise is not null)
             {
-                //string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
-                //Directory.CreateDirectory(basePath);
-                //AttachmentManager.RemoveAttachmentsRange(basePath, exercise.Attachments.Select(a => a.Name));
-
-                //dbContext.Exercises.Remove(exercise);
-
                 exercise.DeletedTS = DateTime.Now;
 
                 await dbContext.SaveChangesAsync();

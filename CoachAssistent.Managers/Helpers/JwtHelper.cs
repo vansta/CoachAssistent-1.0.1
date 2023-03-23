@@ -39,7 +39,7 @@ namespace CoachAssistent.Managers.Helpers
                 IssuerSigningKey = securityKey,
                 ValidIssuer = issuer,
                 ValidAudience = audience,
-                ValidateLifetime = true,
+                //ValidateLifetime = true,
                 ValidateAudience = true,
                 ValidateIssuer = true,
                 RequireExpirationTime = true
@@ -66,7 +66,7 @@ namespace CoachAssistent.Managers.Helpers
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.Now.AddHours(8),
+                //expires: DateTime.Now.AddHours(8),
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);

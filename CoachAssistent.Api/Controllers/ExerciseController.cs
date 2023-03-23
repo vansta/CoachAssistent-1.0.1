@@ -28,9 +28,9 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpGet("Overview")]
-        public OverviewViewModel<ExerciseOverviewItemViewModel> GetExercises()
+        public OverviewViewModel<ExerciseOverviewItemViewModel> GetExercises([FromQuery]BaseSearchViewModel request)
         {
-            return exerciseManager.GetExercises();
+            return exerciseManager.GetExercises(request);
         }
 
         [HttpPost]
