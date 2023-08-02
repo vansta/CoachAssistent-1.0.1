@@ -17,8 +17,8 @@ namespace CoachAssistent.Managers.Helpers
         readonly SymmetricSecurityKey securityKey;
         readonly TokenValidationParameters tokenValidationParameters;
 
-        readonly static string issuer = "oryx-pim-issuer";
-        readonly static string audience = "oxyx-pim-audience";
+        readonly string issuer;
+        readonly string audience;
 
         public TokenValidationParameters TokenValidationParameters
         {
@@ -31,7 +31,9 @@ namespace CoachAssistent.Managers.Helpers
         public JwtHelper(IConfiguration configuration)
         {
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-            string secretKey = configuration["Jwt:Key"];
+            string secretKey = configuration["Jwt:Key"] ?? string.Empty;
+            issuer = configuration["Jwt:Issuer"] ?? string.Empty;
+            audience = configuration["Jwt:Audience"] ?? string.Empty;
             securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
             tokenValidationParameters = new TokenValidationParameters
@@ -42,7 +44,7 @@ namespace CoachAssistent.Managers.Helpers
                 //ValidateLifetime = true,
                 ValidateAudience = true,
                 ValidateIssuer = true,
-                RequireExpirationTime = true
+                //RequireExpirationTime = true
             };
         }
 
@@ -66,10 +68,10 @@ namespace CoachAssistent.Managers.Helpers
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                //expires: DateTime.Now.AddHours(8),
+                expires: DateTime.Now.AddHours(8),
                 signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(jwt);
+            return _jwtSecurityTokenHandler.WriteToken(jwt);
         }
     }
 }

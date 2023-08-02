@@ -10,7 +10,7 @@ JwtHelper jwtHelper = new(builder.Configuration);
 
 
 // Add services to the container.
-builder.Services.AddCors(options => options.AddDefaultPolicy(cfg => cfg.WithOrigins("http://127.0.0.1:5173/").AllowAnyMethod().AllowAnyHeader()));
+builder.Services.AddCors(options => options.AddDefaultPolicy(cfg => cfg.WithOrigins("http://127.0.0.1:5173").AllowAnyMethod().AllowAnyHeader()));
 //var config = new AutoMapper.MapperConfiguration(cfg => cfg.AddProfiles(MapperService.Profiles));
 builder.Services.AddAutoMapper(typeof(ExerciseProfile));
 builder.Services.AddControllers();

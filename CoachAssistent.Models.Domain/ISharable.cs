@@ -9,6 +9,7 @@ namespace CoachAssistent.Models.Domain
 {
     public interface ISharable
     {
+        public Guid Id { get; set; }
         public SharingLevel Shared { get; set; }
         //public Guid UserId { get; set; }
         //public User? User { get; set; }

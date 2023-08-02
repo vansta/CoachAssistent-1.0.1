@@ -77,7 +77,7 @@ namespace CoachAssistent.Managers
         {
             exercise = (await dbContext.Exercises.AddAsync(exercise)).Entity;
 
-            string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
+            string basePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
             Directory.CreateDirectory(basePath);
             foreach (var file in attachments)
             {
@@ -124,8 +124,8 @@ namespace CoachAssistent.Managers
             foreach (var attachmentId in viewModel.SelectedAttachments)
             {
                 Attachment? originalAttachment = await dbContext.Attachments.SingleAsync(a => a.Id == attachmentId);
-                string fromBasePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
-                string toBasePath = Path.Combine(configuration["AttachmentFolder"], newId.ToString());
+                string fromBasePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
+                string toBasePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, newId.ToString());
                 AttachmentManager.CopyAttachment(fromBasePath, toBasePath, originalAttachment);
             }
 
@@ -143,7 +143,7 @@ namespace CoachAssistent.Managers
             exercise.VersionTS = DateTime.Now;
             exercise.Tags = dbContext.Tags.Where(t => viewModel.Tags.Contains(t.Name)).ToHashSet();
 
-            string basePath = Path.Combine(configuration["AttachmentFolder"], exercise.Id.ToString());
+            string basePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
             Directory.CreateDirectory(basePath);
 
             var filesToRemove = exercise.Attachments.Where(a => !viewModel.SelectedAttachments.Any(x => x == a.Id));

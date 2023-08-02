@@ -10,7 +10,10 @@ namespace CoachAssistent.Models.Domain
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-        public Guid SharableId { get; set; }
+        //public Guid SharableId { get; set; }
+        public Guid? ExerciseId { get; set; }
+        public Guid? SegmentId { get; set; }
+        public Guid? TrainingId { get; set; }
 
         public User? User { get; set; }
 

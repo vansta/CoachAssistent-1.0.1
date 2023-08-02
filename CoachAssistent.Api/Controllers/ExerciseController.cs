@@ -4,6 +4,7 @@ using CoachAssistent.Managers;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Exercise;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,9 +31,10 @@ namespace CoachAssistent.Api.Controllers
         [HttpGet("Overview")]
         public OverviewViewModel<ExerciseOverviewItemViewModel> GetExercises([FromQuery]BaseSearchViewModel request)
         {
+            var requestHeaders = Request.Headers;
             return exerciseManager.GetExercises(request);
         }
-
+        //[Authorize]
         [HttpPost]
         public Task<Guid> Create([FromForm]CreateExerciseViewModel exercise)
         {

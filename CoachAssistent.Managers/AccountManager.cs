@@ -21,6 +21,10 @@ namespace CoachAssistent.Managers
     {
         //readonly IConfiguration configuration;
         readonly JwtHelper jwtHelper;
+        const int iterations = 32;
+        const int saltSize = 20;
+        readonly HashAlgorithmName hashAlgorithmName = HashAlgorithmName.SHA256;
+
         public AccountManager(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration) : base(dbContext, mapper)
         {
             //this.configuration = configuration;
@@ -56,10 +60,10 @@ namespace CoachAssistent.Managers
                 LastUpdate = DateTime.Now
             };
 
-            using (Rfc2898DeriveBytes rfc2898DeriveBytes = new(registerData.PasswordHash, 20))
+            using (Rfc2898DeriveBytes rfc2898DeriveBytes = new(registerData.PasswordHash, saltSize, iterations, hashAlgorithmName))
             {
                 user.Salt = rfc2898DeriveBytes.Salt;
-                user.Key = rfc2898DeriveBytes.GetBytes(20);
+                user.Key = rfc2898DeriveBytes.GetBytes(saltSize);
             }
 
             user = (await dbContext.Users.AddAsync(user)).Entity;
@@ -75,8 +79,8 @@ namespace CoachAssistent.Managers
             {
                 throw new Exception($"No user found for {credentials.UserName}");
             }
-            using var deriveBytes = new Rfc2898DeriveBytes(credentials.PasswordHash, user.Salt);
-            byte[] key = deriveBytes.GetBytes(20);
+            using var deriveBytes = new Rfc2898DeriveBytes(credentials.PasswordHash, user.Salt, iterations, hashAlgorithmName);
+            byte[] key = deriveBytes.GetBytes(saltSize);
             if (key.SequenceEqual(user.Key))
             {
                 return mapper.Map<LoggedInUserViewModel>(user);
