@@ -4,6 +4,7 @@ using CoachAssistent.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    partial class CoachAssistentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230802132512_Members")]
+    partial class Members
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,7 +153,7 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Members");
+                    b.ToTable("Memebers");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Role", b =>
@@ -170,27 +173,7 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9ba4fb32-98fb-40f7-ab4a-2341de19a1f3"),
-                            Description = "An administrator can edit everything",
-                            Name = "Administrator"
-                        },
-                        new
-                        {
-                            Id = new Guid("1816bb8a-3077-40ed-9df8-88f93e36098d"),
-                            Description = "A writer can edit and create",
-                            Name = "Writer"
-                        },
-                        new
-                        {
-                            Id = new Guid("942eed55-872d-4c54-9f79-a27b1dcfe1ae"),
-                            Description = "A reader can read",
-                            Name = "Reader"
-                        });
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Segment", b =>

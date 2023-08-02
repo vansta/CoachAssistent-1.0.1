@@ -7,23 +7,16 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.Domain
 {
-    public class Group
+    public class Role
     {
-        public Group()
+        public Role()
         {
             Name = string.Empty;
-            Members = new HashSet<Member>();
-            Tags = new HashSet<Tag>();
-            SharablesXGroups = new HashSet<SharablesXGroups>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
         public string Name { get; set; }
         [MaxLength(1024)]
         public string? Description { get; set; }
-
-        public ICollection<Member> Members { get; set; }
-        public ICollection<Tag> Tags { get; set; }
-        public ICollection<SharablesXGroups> SharablesXGroups { get; set; }
     }
 }

@@ -22,6 +22,8 @@ namespace CoachAssistent.Data
         public DbSet<SegmentXExercise> SegmentsXExercises => Set<SegmentXExercise>();
         public DbSet<TrainingXSegment> TrainingsXSegments => Set<TrainingXSegment>();
         public DbSet<Editor> Editors => Set<Editor>();
+        public DbSet<Member> Members => Set<Member>();
+        public DbSet<Role> Roles => Set<Role>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -61,41 +63,25 @@ namespace CoachAssistent.Data
                 .WithMany(s => s.TrainingsXSegments)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            //modelBuilder
-            //    .Entity<Training>()
-            //    .HasMany(t => t.SharablesXGroups)
-            //    .WithOne(sg => sg.Training)
-            //    .HasForeignKey(sg => sg.SharableId);
-
-            //modelBuilder
-            //    .Entity<Training>()
-            //    .HasMany(t => t.Editors)
-            //    .WithOne(sg => sg.Training)
-            //    .HasForeignKey(sg => sg.SharableId);
-
-            //modelBuilder
-            //    .Entity<Segment>()
-            //    .HasMany(t => t.SharablesXGroups)
-            //    .WithOne(sg => sg.Segment)
-            //    .HasForeignKey(sg => sg.SharableId);
-
-            //modelBuilder
-            //    .Entity<Segment>()
-            //    .HasMany(t => t.Editors)
-            //    .WithOne(sg => sg.Segment)
-            //    .HasForeignKey(sg => sg.SharableId);
-
-            //modelBuilder
-            //    .Entity<Exercise>()
-            //    .HasMany(t => t.SharablesXGroups)
-            //    .WithOne(sg => sg.Exercise)
-            //    .HasForeignKey(sg => sg.SharableId);
-
-            //modelBuilder
-            //    .Entity<Exercise>()
-            //    .HasMany(t => t.Editors)
-            //    .WithOne(sg => sg.Exercise)
-            //    .HasForeignKey(sg => sg.SharableId);
+            modelBuilder.Entity<Role>()
+                .HasData(new Role
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Administrator",
+                    Description = "An administrator can edit everything"
+                },
+                new Role
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Writer",
+                    Description = "A writer can edit and create"
+                },
+                new Role
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Reader",
+                    Description = "A reader can read"
+                });
         }
     }
 }

@@ -5,6 +5,7 @@ using CoachAssistent.Managers;
 using CoachAssistent.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using CoachAssistent.Models.ViewModels.Group;
 
 namespace CoachAssistent.Api.Controllers
 {
@@ -23,6 +24,12 @@ namespace CoachAssistent.Api.Controllers
         public Task<IEnumerable<SelectViewModel>> GetGroupsForUser()
         {
             return groupManager.GetGroupsForUser();
+        }
+
+        [HttpPost]
+        public Task<Guid> CreateGroup(CreateGroupViewModel createGroupViewModel)
+        {
+            return groupManager.CreateGroup(createGroupViewModel);
         }
     }
 }

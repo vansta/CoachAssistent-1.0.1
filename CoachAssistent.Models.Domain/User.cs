@@ -11,7 +11,7 @@ namespace CoachAssistent.Models.Domain
             Salt = new byte[32];
             Key = new byte[32];
 
-            Groups = new HashSet<Group>();
+            Memberships = new HashSet<Member>();
             //Exercises = new HashSet<Exercise>();
             //Segments = new HashSet<Segment>();
             //Trainings = new HashSet<Training>();
@@ -32,6 +32,6 @@ namespace CoachAssistent.Models.Domain
         public DateTime CreationDate { get; set; }
         public DateTime LastUpdate { get; set; }
 
-        public ICollection<Group> Groups { get; set; }
+        public ICollection<Member> Memberships { get; set; }
     }
 }
