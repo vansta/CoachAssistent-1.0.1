@@ -16,5 +16,10 @@ namespace CoachAssistent.Models.Domain
         public int Id { get; set; }
         [MaxLength(64)]
         public string Name { get; set; }
+
+        public ICollection<Group> Groups { get; set; } = new HashSet<Group>();
+        public ICollection<Segment> Segments { get; set; } = new HashSet<Segment>();
+        public ICollection<Exercise> Exercises { get; set; } = new HashSet<Exercise>();
+        public ICollection<Training> Trainings { get; set; } = new HashSet<Training>();
     }
 }

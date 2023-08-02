@@ -37,12 +37,13 @@ namespace CoachAssistent.Managers
                         (c.Shared == SharingLevel.Public)
                     ||
                         //private
-                        (c.Shared == SharingLevel.Private && c.UserId == userId)
+                        (c.Shared == SharingLevel.Private && c.Editors.Select(e => e.UserId).Contains(userId))
                     ||
                         //group
                         (c.Shared == SharingLevel.Group
-                            && c.User != null
-                            && c.User.Groups.Select(ug => ug.Id).Any(ugi => groupIds.Contains(ugi))
+                            && c.SharablesXGroups.Any(sg => groupIds.Contains(sg.GroupId))
+                            //&& c.User != null
+                            //&& c.User.Groups.Select(ug => ug.Id).Any(ugi => groupIds.Contains(ugi))
                         )
                     );
             }

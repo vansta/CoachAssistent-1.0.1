@@ -18,6 +18,7 @@ namespace CoachAssistent.Models.Domain
             Segments = new HashSet<Segment>();
             SharablesXGroups = new HashSet<SharablesXGroups>();
             SegmentsXExercises = new HashSet<SegmentXExercise>();
+            Editors = new HashSet<Editor>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -26,15 +27,16 @@ namespace CoachAssistent.Models.Domain
 
         public SharingLevel Shared { get; set; }
         public DateTime VersionTS { get; set; }
-        public Guid? OriginalId { get; set; }
-        public DateTime? OriginalVersionTS { get; set; }
+        //public Guid? OriginalId { get; set; }
+        //public DateTime? OriginalVersionTS { get; set; }
 
         public DateTime? DeletedTS { get; set; }
 
-        public Guid UserId { get; set; }
-        public User? User { get; set; }
-        public Exercise? Original { get; set; }
+        //public Guid UserId { get; set; }
+        //public User? User { get; set; }
+        //public Exercise? Original { get; set; }
 
+        public ICollection<Editor> Editors { get; set; }
         public ICollection<Attachment> Attachments { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public ICollection<Segment> Segments { get; set; }

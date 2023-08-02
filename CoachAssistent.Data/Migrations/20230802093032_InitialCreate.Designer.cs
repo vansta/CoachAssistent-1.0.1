@@ -12,17 +12,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    [Migration("20221013122107_InitialCreate")]
+    [Migration("20230802093032_InitialCreate")]
     partial class InitialCreate
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.6")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Attachment", b =>
                 {
@@ -50,6 +51,27 @@ namespace CoachAssistent.Data.Migrations
                     b.ToTable("Attachments");
                 });
 
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Editor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SharableId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SharableId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Editors");
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.Exercise", b =>
                 {
                     b.Property<Guid>("Id")
@@ -67,26 +89,13 @@ namespace CoachAssistent.Data.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<Guid?>("OriginalId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("OriginalVersionTS")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Shared")
                         .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("VersionTS")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OriginalId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Exercises");
                 });
@@ -137,15 +146,10 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<int>("Shared")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("VersionTS")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Segments");
                 });
@@ -174,27 +178,17 @@ namespace CoachAssistent.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ExerciseId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("SegmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("TrainingId")
+                    b.Property<Guid>("SharableId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExerciseId");
-
                     b.HasIndex("GroupId");
 
-                    b.HasIndex("SegmentId");
-
-                    b.HasIndex("TrainingId");
+                    b.HasIndex("SharableId");
 
                     b.ToTable("SharablesXGroups");
                 });
@@ -205,34 +199,14 @@ namespace CoachAssistent.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<Guid?>("ExerciseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("GroupId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<Guid?>("SegmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("TrainingId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("SegmentId");
-
-                    b.HasIndex("TrainingId");
 
                     b.ToTable("Tags");
                 });
@@ -263,15 +237,10 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<int>("Shared")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("VersionTS")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Trainings");
                 });
@@ -311,6 +280,9 @@ namespace CoachAssistent.Data.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<byte[]>("Key")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -333,22 +305,69 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GroupUser", b =>
+            modelBuilder.Entity("ExerciseTag", b =>
+                {
+                    b.Property<Guid>("ExercisesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ExercisesId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("ExerciseTag");
+                });
+
+            modelBuilder.Entity("GroupTag", b =>
                 {
                     b.Property<Guid>("GroupsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsersId")
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupsId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("GroupTag");
+                });
+
+            modelBuilder.Entity("SegmentTag", b =>
+                {
+                    b.Property<Guid>("SegmentsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("GroupsId", "UsersId");
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("UsersId");
+                    b.HasKey("SegmentsId", "TagsId");
 
-                    b.ToTable("GroupUser");
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("SegmentTag");
+                });
+
+            modelBuilder.Entity("TagTraining", b =>
+                {
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TrainingsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TagsId", "TrainingsId");
+
+                    b.HasIndex("TrainingsId");
+
+                    b.ToTable("TagTraining");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Attachment", b =>
@@ -360,30 +379,37 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("Exercise");
                 });
 
-            modelBuilder.Entity("CoachAssistent.Models.Domain.Exercise", b =>
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Editor", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Exercise", "Original")
+                    b.HasOne("CoachAssistent.Models.Domain.Exercise", "Exercise")
+                        .WithMany("Editors")
+                        .HasForeignKey("SharableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Segment", "Segment")
+                        .WithMany("Editors")
+                        .HasForeignKey("SharableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Training", "Training")
+                        .WithMany("Editors")
+                        .HasForeignKey("SharableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.User", "User")
                         .WithMany()
-                        .HasForeignKey("OriginalId");
-
-                    b.HasOne("CoachAssistent.Models.Domain.User", "User")
-                        .WithMany("Exercises")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Original");
+                    b.Navigation("Exercise");
 
-                    b.Navigation("User");
-                });
+                    b.Navigation("Segment");
 
-            modelBuilder.Entity("CoachAssistent.Models.Domain.Segment", b =>
-                {
-                    b.HasOne("CoachAssistent.Models.Domain.User", "User")
-                        .WithMany("Segments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Training");
 
                     b.Navigation("User");
                 });
@@ -409,23 +435,29 @@ namespace CoachAssistent.Data.Migrations
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.SharablesXGroups", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Exercise", "Exercise")
-                        .WithMany("SharablesXGroups")
-                        .HasForeignKey("ExerciseId");
-
                     b.HasOne("CoachAssistent.Models.Domain.Group", "Group")
                         .WithMany("SharablesXGroups")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CoachAssistent.Models.Domain.Exercise", "Exercise")
+                        .WithMany("SharablesXGroups")
+                        .HasForeignKey("SharableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CoachAssistent.Models.Domain.Segment", "Segment")
                         .WithMany("SharablesXGroups")
-                        .HasForeignKey("SegmentId");
+                        .HasForeignKey("SharableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CoachAssistent.Models.Domain.Training", "Training")
                         .WithMany("SharablesXGroups")
-                        .HasForeignKey("TrainingId");
+                        .HasForeignKey("SharableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Exercise");
 
@@ -434,36 +466,6 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("Segment");
 
                     b.Navigation("Training");
-                });
-
-            modelBuilder.Entity("CoachAssistent.Models.Domain.Tag", b =>
-                {
-                    b.HasOne("CoachAssistent.Models.Domain.Exercise", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("ExerciseId");
-
-                    b.HasOne("CoachAssistent.Models.Domain.Group", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("GroupId");
-
-                    b.HasOne("CoachAssistent.Models.Domain.Segment", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("SegmentId");
-
-                    b.HasOne("CoachAssistent.Models.Domain.Training", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("TrainingId");
-                });
-
-            modelBuilder.Entity("CoachAssistent.Models.Domain.Training", b =>
-                {
-                    b.HasOne("CoachAssistent.Models.Domain.User", "User")
-                        .WithMany("Trainings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.TrainingXSegment", b =>
@@ -485,7 +487,29 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("Training");
                 });
 
-            modelBuilder.Entity("GroupUser", b =>
+            modelBuilder.Entity("CoachAssistent.Models.Domain.User", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Group", null)
+                        .WithMany("Users")
+                        .HasForeignKey("GroupId");
+                });
+
+            modelBuilder.Entity("ExerciseTag", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Exercise", null)
+                        .WithMany()
+                        .HasForeignKey("ExercisesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("GroupTag", b =>
                 {
                     b.HasOne("CoachAssistent.Models.Domain.Group", null)
                         .WithMany()
@@ -493,9 +517,39 @@ namespace CoachAssistent.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoachAssistent.Models.Domain.User", null)
+                    b.HasOne("CoachAssistent.Models.Domain.Tag", null)
                         .WithMany()
-                        .HasForeignKey("UsersId")
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SegmentTag", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Segment", null)
+                        .WithMany()
+                        .HasForeignKey("SegmentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TagTraining", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Training", null)
+                        .WithMany()
+                        .HasForeignKey("TrainingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -504,47 +558,38 @@ namespace CoachAssistent.Data.Migrations
                 {
                     b.Navigation("Attachments");
 
+                    b.Navigation("Editors");
+
                     b.Navigation("SegmentsXExercises");
 
                     b.Navigation("SharablesXGroups");
-
-                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Group", b =>
                 {
                     b.Navigation("SharablesXGroups");
 
-                    b.Navigation("Tags");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Segment", b =>
                 {
+                    b.Navigation("Editors");
+
                     b.Navigation("SegmentsXExercises");
 
                     b.Navigation("SharablesXGroups");
-
-                    b.Navigation("Tags");
 
                     b.Navigation("TrainingsXSegments");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Training", b =>
                 {
+                    b.Navigation("Editors");
+
                     b.Navigation("SharablesXGroups");
 
-                    b.Navigation("Tags");
-
                     b.Navigation("TrainingsXSegments");
-                });
-
-            modelBuilder.Entity("CoachAssistent.Models.Domain.User", b =>
-                {
-                    b.Navigation("Exercises");
-
-                    b.Navigation("Segments");
-
-                    b.Navigation("Trainings");
                 });
 #pragma warning restore 612, 618
         }

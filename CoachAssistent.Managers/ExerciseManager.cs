@@ -62,7 +62,8 @@ namespace CoachAssistent.Managers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Shared = Common.Enums.SharingLevel.Public,
-                UserId = authenticationWrapper.UserId,
+                //UserId = authenticationWrapper.UserId,
+                Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
                 VersionTS = DateTime.Now,
                 Tags = dbContext.Tags
                     .Where(t => viewModel.Tags.Contains(t.Name))
@@ -91,9 +92,10 @@ namespace CoachAssistent.Managers
         {
             Exercise? exercise = await dbContext.Exercises
                 .Include(e => e.Attachments)
+                .Include(e => e.Editors)
                 .SingleAsync(e => e.Id.Equals(viewModel.Id));
 
-            if (exercise.UserId == authenticationWrapper.UserId)
+            if (exercise.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId))
             {
                 return await Update(viewModel);
             }
@@ -107,13 +109,14 @@ namespace CoachAssistent.Managers
         {
             Exercise copy = new()
             {
-                UserId = authenticationWrapper.UserId,
+                //UserId = authenticationWrapper.UserId,
+                Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Shared = Common.Enums.SharingLevel.Private,
                 VersionTS = DateTime.Now,
-                OriginalId = exercise.Id,
-                OriginalVersionTS = exercise.OriginalVersionTS
+                //OriginalId = exercise.Id,
+                //OriginalVersionTS = exercise.OriginalVersionTS
             };
 
             Guid newId = await Create(copy, viewModel.AddedAttachments);

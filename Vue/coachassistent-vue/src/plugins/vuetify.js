@@ -1,7 +1,9 @@
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
+import '@mdi/font/css/materialdesignicons.css';
 
-export default createVuetify({
+export default createVuetify(
+  {
     // theme: {
     //     defaultTheme: 'myCustomLightTheme',
     //     themes: {
@@ -21,8 +23,10 @@ export default createVuetify({
         variant: 'solo',
         density: 'compact'
       },
-      VCard: {
-        variant: 'flat'
+      VAutocomplete: {
+        variant: 'solo',
+        density: 'compact'
       }
     }
-});
+}
+);

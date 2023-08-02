@@ -10,9 +10,11 @@ namespace CoachAssistent.Models.Domain
     public interface ISharable
     {
         public SharingLevel Shared { get; set; }
-        public Guid UserId { get; set; }
-        public User? User { get; set; }
+        //public Guid UserId { get; set; }
+        //public User? User { get; set; }
 
         public DateTime? DeletedTS { get; set; }
+        public ICollection<Editor> Editors { get; set; }
+        public ICollection<SharablesXGroups> SharablesXGroups { get; set; }
     }
 }

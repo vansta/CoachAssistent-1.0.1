@@ -53,7 +53,8 @@ namespace CoachAssistent.Managers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 //Exercises = exercises.ToHashSet(),
-                UserId = authenticationWrapper.UserId,
+                //UserId = authenticationWrapper.UserId,
+                Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
                 VersionTS = DateTime.Now
             };
             training.Segments = dbContext

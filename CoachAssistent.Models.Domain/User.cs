@@ -12,9 +12,9 @@ namespace CoachAssistent.Models.Domain
             Key = new byte[32];
 
             Groups = new HashSet<Group>();
-            Exercises = new HashSet<Exercise>();
-            Segments = new HashSet<Segment>();
-            Trainings = new HashSet<Training>();
+            //Exercises = new HashSet<Exercise>();
+            //Segments = new HashSet<Segment>();
+            //Trainings = new HashSet<Training>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -33,8 +33,5 @@ namespace CoachAssistent.Models.Domain
         public DateTime LastUpdate { get; set; }
 
         public ICollection<Group> Groups { get; set; }
-        public ICollection<Exercise> Exercises { get; set; }
-        public ICollection<Segment> Segments { get; set; }
-        public ICollection<Training> Trainings { get; set; }
     }
 }
