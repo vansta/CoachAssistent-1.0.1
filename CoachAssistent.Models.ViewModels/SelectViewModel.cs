@@ -13,6 +13,11 @@ namespace CoachAssistent.Models.ViewModels
             Value = id.ToString();
             Title = title;
         }
+        public SelectViewModel(int id, string? title)
+        {
+            Value = id.ToString();
+            Title = title;
+        }
         public SelectViewModel(string? value, string? title)
         {
             Value = value;
