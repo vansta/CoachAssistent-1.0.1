@@ -39,7 +39,7 @@ namespace CoachAssistent.Managers
             {
                 Name = createGroupViewModel.Name ?? "New group",
                 Description = createGroupViewModel.Description,
-                Tags = createGroupViewModel.Tags is not null ? dbContext.Tags.Where(t => createGroupViewModel.Tags.Contains(t.Name)).ToList() : new HashSet<Tag>(),
+                Tags = CondenseTags(createGroupViewModel.Tags),
                 Members = createGroupViewModel.Members is not null ? createGroupViewModel.Members.Select(m => new Member() { UserId = m.UserId, RoleId = m.RoleId }).ToList()
                 : new List<Member>()
             };

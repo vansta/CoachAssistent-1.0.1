@@ -15,13 +15,15 @@ namespace CoachAssistent.Models.ViewModels.Exercise
             Name = string.Empty;
             AddedAttachments = new HashSet<IFormFile>();
             Tags = new HashSet<string>();
+            Editors = new HashSet<Guid>();
         }
         public string Name { get; set; }
         public string? Description { get; set; }
 
-        public SharingLevel Shared { get; set; }
-
         public ICollection<IFormFile> AddedAttachments { get; set; }
         public ICollection<string> Tags { get; set; }
+
+        public SharingLevel SharingLevel { get; set; }
+        public ICollection<Guid> Editors { get; set; }
     }
 }

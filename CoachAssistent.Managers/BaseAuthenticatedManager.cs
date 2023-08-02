@@ -25,7 +25,7 @@ namespace CoachAssistent.Managers
                 .Where(c => !c.DeletedTS.HasValue);
             if (!authenticationWrapper.IsLoggedIn)
             {
-                collection = collection.Where(c => c.Shared == SharingLevel.Public);
+                collection = collection.Where(c => c.SharingLevel == SharingLevel.Public);
             }
             else
             {
@@ -34,13 +34,13 @@ namespace CoachAssistent.Managers
                 collection = collection
                     .Where(c =>
                         //public
-                        (c.Shared == SharingLevel.Public)
+                        (c.SharingLevel == SharingLevel.Public)
                     ||
                         //private
-                        (c.Shared == SharingLevel.Private && c.Editors.Select(e => e.UserId).Contains(userId))
+                        (c.SharingLevel == SharingLevel.Private && c.Editors.Select(e => e.UserId).Contains(userId))
                     ||
                         //group
-                        (c.Shared == SharingLevel.Group
+                        (c.SharingLevel == SharingLevel.Group
                             && c.SharablesXGroups.Any(sg => groupIds.Contains(sg.GroupId))
                             //&& c.User != null
                             //&& c.User.Groups.Select(ug => ug.Id).Any(ugi => groupIds.Contains(ugi))
@@ -49,6 +49,37 @@ namespace CoachAssistent.Managers
             }
 
             return collection;
+        }
+
+        internal ICollection<Tag> CondenseTags(IEnumerable<string>? tags)
+        {
+            return tags?.Where(x => !string.IsNullOrEmpty(x)).Select(x =>
+            {
+                Tag? tag = dbContext.Tags.FirstOrDefault(t => t.Name.ToUpper().Equals(x.ToUpper()));
+                return tag ?? new Tag { Name = x };
+            }).ToList() ?? new List<Tag>();
+        }
+
+        internal ICollection<Editor> CondenseEditors(ISharable sharable, IEnumerable<Guid>? editors)
+        {
+            if (editors is null || !editors.Any())
+            {
+                if (sharable.Editors.Count > 0)
+                {
+                    return sharable.Editors;
+                }
+                else
+                {
+                    //editors must contain at least one user
+                    return new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } };
+                }
+            };
+
+            return editors.Select(x =>
+            {
+                Editor? editor = sharable.Editors.FirstOrDefault(e => e.UserId.Equals(x));
+                return editor ?? new Editor { UserId = x };
+            }).ToList();
         }
     }
 }

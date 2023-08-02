@@ -30,10 +30,10 @@ namespace CoachAssistent.Managers
 
         public async Task<SegmentViewModel> GetSegment(Guid id)
         {
-            Segment? segemnt = await dbContext.Segments
+            Segment? segment = await dbContext.Segments
                 .Include(s => s.Exercises).ThenInclude(e => e.Attachments)
                 .SingleAsync(s => s.Id.Equals(id));
-            return mapper.Map<SegmentViewModel>(segemnt);
+            return mapper.Map<SegmentViewModel>(segment);
         }
 
         public async Task<Guid> Create(SegmentViewModel viewModel)
@@ -45,10 +45,10 @@ namespace CoachAssistent.Managers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Exercises = exercises.ToHashSet(),
-                //UserId = authenticationWrapper.UserId,
-                Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
                 VersionTS = DateTime.Now
             };
+            segment.Editors = CondenseEditors(segment, viewModel.Editors);
+
             segment = (await dbContext.Segments.AddAsync(segment)).Entity;
             await dbContext.SaveChangesAsync();
 
@@ -69,6 +69,7 @@ namespace CoachAssistent.Managers
             segment.Exercises = dbContext
                 .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
 
+            segment.Editors = CondenseEditors(segment, viewModel.Editors);
             await dbContext.SaveChangesAsync();
         }
 

@@ -25,5 +25,11 @@ namespace CoachAssistent.Api.Controllers
         {
             return userManager.GetAvailableEditors();
         }
+
+        [HttpGet("AssignedEditors")]
+        public IEnumerable<Guid> GetAssignedEditors(Guid id, string? type = null)
+        {
+            return userManager.GetAssignedEditors(id, type);
+        }
     }
 }

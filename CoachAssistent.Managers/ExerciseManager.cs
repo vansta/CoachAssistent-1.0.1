@@ -61,14 +61,14 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                Shared = Common.Enums.SharingLevel.Public,
+                SharingLevel = viewModel.SharingLevel,
                 //UserId = authenticationWrapper.UserId,
-                Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
+                //Editors = viewModel.Editors.Select(e => new Editor { UserId = e }).ToHashSet(),// new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
                 VersionTS = DateTime.Now,
-                Tags = dbContext.Tags
-                    .Where(t => viewModel.Tags.Contains(t.Name))
-                    .ToHashSet()
+                Tags = CondenseTags(viewModel.Tags)
             };
+
+            exercise.Editors = CondenseEditors(exercise, viewModel.Editors);
 
             return Create(exercise, viewModel.AddedAttachments);
         }
@@ -110,14 +110,16 @@ namespace CoachAssistent.Managers
             Exercise copy = new()
             {
                 //UserId = authenticationWrapper.UserId,
-                Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
+                //Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                Shared = Common.Enums.SharingLevel.Private,
+                SharingLevel = viewModel.SharingLevel,// Common.Enums.SharingLevel.Private,
                 VersionTS = DateTime.Now,
                 //OriginalId = exercise.Id,
                 //OriginalVersionTS = exercise.OriginalVersionTS
             };
+
+            copy.Editors = CondenseEditors(copy, viewModel.Editors);
 
             Guid newId = await Create(copy, viewModel.AddedAttachments);
 
@@ -136,12 +138,17 @@ namespace CoachAssistent.Managers
         {
             Exercise? exercise = await dbContext.Exercises
                 .Include(e => e.Attachments)
+                .Include(e => e.Tags)
+                .Include(e => e.Editors)
                 .SingleAsync(e => e.Id.Equals(viewModel.Id));
 
             exercise.Name = viewModel.Name;
             exercise.Description = viewModel.Description;
             exercise.VersionTS = DateTime.Now;
-            exercise.Tags = dbContext.Tags.Where(t => viewModel.Tags.Contains(t.Name)).ToHashSet();
+            exercise.SharingLevel = viewModel.SharingLevel;
+            exercise.Tags = CondenseTags(viewModel.Tags);
+
+            exercise.Editors = CondenseEditors(exercise, viewModel.Editors);
 
             string basePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
             Directory.CreateDirectory(basePath);

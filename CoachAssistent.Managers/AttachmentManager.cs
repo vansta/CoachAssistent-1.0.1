@@ -25,7 +25,7 @@ namespace CoachAssistent.Managers
             Attachment? attachment = await dbContext.Attachments.FindAsync(id);
             if (attachment != null && attachment.ExerciseId.HasValue)
             {
-                string path = Path.Combine(configuration["AttachmentFolder"], attachment.ExerciseId.Value.ToString(), attachment.FilePath);
+                string path = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, attachment.ExerciseId.Value.ToString(), attachment.FilePath);
                 return File.ReadAllBytes(path);
             }
             else
