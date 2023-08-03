@@ -9,6 +9,10 @@ namespace CoachAssistent.Models.Domain
 {
     public class HistoryLog
     {
+        public HistoryLog()
+        {
+
+        }
         public HistoryLog(EditActionType editAction, Guid userId, Guid? originId)
         {
             Timestamp = DateTime.Now;

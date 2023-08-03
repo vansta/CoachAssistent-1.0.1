@@ -31,7 +31,7 @@ namespace CoachAssistent.Models.Domain
         public DateTime? DeletedTS { get; set; }
         public int HistoryId { get; set; }
 
-        public History History { get; set; }
+        public History? History { get; set; }
         public ICollection<Editor> Editors { get; set; }
         public ICollection<Attachment> Attachments { get; set; }
         public ICollection<Tag> Tags { get; set; }

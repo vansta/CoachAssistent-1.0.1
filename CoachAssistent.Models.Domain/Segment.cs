@@ -32,7 +32,7 @@ namespace CoachAssistent.Models.Domain
         public DateTime? DeletedTS { get; set; }
         public int HistoryId { get; set; }
 
-        public History History { get; set; }
+        public History? History { get; set; }
         public ICollection<Editor> Editors { get; set; }
         public ICollection<Exercise> Exercises { get; set; }
         public ICollection<Training> Trainings { get; set; }

@@ -34,7 +34,7 @@ namespace CoachAssistent.Models.Domain
 
         public int HistoryId { get; set; }
 
-        public History History { get; set; }
+        public History? History { get; set; }
 
         public ICollection<Editor> Editors { get; set; }
         public ICollection<Segment> Segments { get; set; }
