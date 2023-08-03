@@ -18,6 +18,7 @@ namespace CoachAssistent.Models.Domain
             SharablesXGroups = new HashSet<SharablesXGroups>();
             TrainingsXSegments = new HashSet<TrainingXSegment>();
             Editors = new HashSet<Editor>();
+            //History = new HashSet<HistoryLog>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -31,13 +32,15 @@ namespace CoachAssistent.Models.Domain
 
         public DateTime? DeletedTS { get; set; }
 
-        //public Guid UserId { get; set; }
-        //public User? User { get; set; }
+        public int HistoryId { get; set; }
+
+        public History History { get; set; }
 
         public ICollection<Editor> Editors { get; set; }
         public ICollection<Segment> Segments { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public ICollection<SharablesXGroups> SharablesXGroups { get; set; }
         public ICollection<TrainingXSegment> TrainingsXSegments { get; set; }
+        //public ICollection<HistoryLog> History { get; set; }
     }
 }

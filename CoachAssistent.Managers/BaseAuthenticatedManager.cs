@@ -51,6 +51,16 @@ namespace CoachAssistent.Managers
             return collection;
         }
 
+        internal async Task<int> AddHistoryLog(int historyId, EditActionType editActionType, Guid? originId = null)
+        {
+            History? history = await dbContext.Histories.FindAsync(historyId);
+            history ??= (await dbContext.Histories.AddAsync(new History())).Entity;
+            history.HistoryLogs.Add(new HistoryLog(editActionType, authenticationWrapper.UserId, originId));
+            await dbContext.SaveChangesAsync();
+
+            return history.Id;
+        }
+
         internal ICollection<Tag> CondenseTags(IEnumerable<string>? tags)
         {
             return tags?.Where(x => !string.IsNullOrEmpty(x)).Select(x =>

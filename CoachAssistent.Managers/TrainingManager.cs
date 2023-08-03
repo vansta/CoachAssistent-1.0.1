@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CoachAssistent.Common.Enums;
 using CoachAssistent.Data;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
@@ -59,6 +60,7 @@ namespace CoachAssistent.Managers
             };
             training.Segments = dbContext
                 .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
+            training.HistoryId = await AddHistoryLog(training.HistoryId, EditActionType.Edit);
             training = (await dbContext.Trainings.AddAsync(training)).Entity;
             await dbContext.SaveChangesAsync();
 
@@ -79,8 +81,7 @@ namespace CoachAssistent.Managers
             training.Segments = dbContext
                 .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
 
-            //training.Exercises = dbContext
-            //    .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
+            await AddHistoryLog(training.HistoryId, EditActionType.Edit);
 
             await dbContext.SaveChangesAsync();
         }
@@ -90,7 +91,7 @@ namespace CoachAssistent.Managers
             Training? training = await dbContext.Trainings.FindAsync(id);
             if (training is not null)
             {
-                //dbContext.Trainings.Remove(training);
+                await AddHistoryLog(training.HistoryId, EditActionType.Edit);
                 training.DeletedTS = DateTime.Now;
                 await dbContext.SaveChangesAsync();
             }

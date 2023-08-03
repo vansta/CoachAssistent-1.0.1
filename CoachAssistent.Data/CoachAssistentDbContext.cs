@@ -24,6 +24,8 @@ namespace CoachAssistent.Data
         public DbSet<Editor> Editors => Set<Editor>();
         public DbSet<Member> Members => Set<Member>();
         public DbSet<Role> Roles => Set<Role>();
+        public DbSet<HistoryLog> HistoryLogs => Set<HistoryLog>();
+        public DbSet<History> Histories => Set<History>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
