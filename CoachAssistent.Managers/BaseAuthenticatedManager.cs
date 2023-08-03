@@ -19,6 +19,19 @@ namespace CoachAssistent.Managers
             this.authenticationWrapper = authenticationWrapper;
         }
 
+        //public bool Can<T>(Guid entityId, string subject, string action, string field) where T : ISharable
+        //{
+        //    switch (subject)
+        //    {
+        //        case "group":
+        //            return dbContext.Members
+        //                .Where(m => m.GroupId.Equals(entityId) && m.UserId == authenticationWrapper.UserId)
+        //                .Any(m => m.Role.RolePermissions)
+        //        default:
+        //            break;
+        //    }
+        //}
+
         public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : ISharable
         {
             collection = collection

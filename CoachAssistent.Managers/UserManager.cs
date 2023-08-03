@@ -3,6 +3,7 @@ using CoachAssistent.Data;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
+using CoachAssistent.Models.ViewModels.Permission;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -50,6 +51,18 @@ namespace CoachAssistent.Managers
         public IEnumerable<SelectViewModel> GetAvailableEditors()
         {
             return dbContext.Users.Select(u => new SelectViewModel(u.Id, u.UserName));
+        }
+
+        public void GetPermissions()
+        {
+            var groupPermissions = dbContext.Members
+                .Where(m => m.UserId.Equals(authenticationWrapper.UserId))
+                .SelectMany(m =>
+                {
+                    m.Role.RolePermissions.Select(rp => new RolePermissionViewModel(rp.Action, rp.Subject, m.GroupId, rp.Fields))
+                })
+                .SelectMany(m => m.Role!.RolePermissions)
+                .Select(rp => rp.Action.Name, )
         }
     }
 }

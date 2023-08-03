@@ -1,4 +1,5 @@
 ﻿using CoachAssistent.Models.Domain;
+using CoachAssistent.Models.Domain.Permissions;
 using Microsoft.EntityFrameworkCore;
 
 namespace CoachAssistent.Data
@@ -26,6 +27,12 @@ namespace CoachAssistent.Data
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<HistoryLog> HistoryLogs => Set<HistoryLog>();
         public DbSet<History> Histories => Set<History>();
+
+        public DbSet<PermissionAction> PermissionActions => Set<PermissionAction>();
+        public DbSet<PermissionSubject> PermissionSubjects => Set<PermissionSubject>();
+        public DbSet<PermissionField> PermissionFields => Set<PermissionField>();
+        public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+        public DbSet<RolePermissionXPermissionField> RolePermissionsXPermissionFields => Set<RolePermissionXPermissionField>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,24 +72,89 @@ namespace CoachAssistent.Data
                 .WithMany(s => s.TrainingsXSegments)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder
+                .Entity<RolePermissionXPermissionField>()
+                .HasOne(se => se.RolePermission)
+                .WithMany(s => s.Fields)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder
+                .Entity<RolePermissionXPermissionField>()
+                .HasOne(se => se.PermissionField)
+                .WithMany(s => s.RolePermissions)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            Guid adminId = Guid.NewGuid();
+            Guid writerId = Guid.NewGuid();
+            Guid readerId = Guid.NewGuid();
             modelBuilder.Entity<Role>()
                 .HasData(new Role
                 {
-                    Id = Guid.NewGuid(),
+                    Id = adminId,
                     Name = "Administrator",
                     Description = "An administrator can edit everything"
                 },
                 new Role
                 {
-                    Id = Guid.NewGuid(),
+                    Id = writerId,
                     Name = "Writer",
                     Description = "A writer can edit and create"
                 },
                 new Role
                 {
-                    Id = Guid.NewGuid(),
+                    Id = readerId,
                     Name = "Reader",
                     Description = "A reader can read"
+                });
+            modelBuilder.Entity<PermissionAction>()
+                .HasData(new PermissionAction
+                {
+                    Id = 1,
+                    Name = "create"
+                }, new PermissionAction
+                {
+                    Id = 2,
+                    Name = "read"
+                },
+                new PermissionAction
+                {
+                    Id = 3,
+                    Name = "update"
+                },
+                new PermissionAction
+                {
+                    Id = 4,
+                    Name = "delete"
+                });
+            modelBuilder.Entity<PermissionSubject>()
+                .HasData(new PermissionSubject
+                {
+                    Id = 1,
+                    Name = "exercise"
+                },
+                new PermissionSubject
+                {
+                    Id = 2,
+                    Name = "segment"
+                },
+                new PermissionSubject
+                {
+                    Id = 3,
+                    Name = "training"
+                },
+                new PermissionSubject
+                {
+                    Id = 4,
+                    Name = "group"
+                });
+
+            modelBuilder.Entity<RolePermission>()
+                .HasData(new RolePermission
+                {
+                    Id = 1,
+                    RoleId = adminId,
+                    ActionId = 1,
+                    SubjectId = 1
                 });
         }
     }

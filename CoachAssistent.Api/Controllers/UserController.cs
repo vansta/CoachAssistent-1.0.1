@@ -31,5 +31,11 @@ namespace CoachAssistent.Api.Controllers
         {
             return userManager.GetAssignedEditors(id, type);
         }
+
+        [HttpGet("Permissions")]
+        public void GetPermissions()
+        {
+
+        }
     }
 }
