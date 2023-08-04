@@ -44,7 +44,13 @@ namespace CoachAssistent.Api.Controllers
         [HttpPut]
         public Task<Guid> Update([FromForm] UpdateExerciseViewModel exercise)
         {
-            return exerciseManager.UpdateOrCopy(exercise);
+            return exerciseManager.Update(exercise);
+        }
+
+        [HttpPost("Copy")]
+        public Task<Guid> Copy([FromBody] Guid exerciseId)
+        {
+            return exerciseManager.Copy(exerciseId);
         }
 
         [HttpDelete]

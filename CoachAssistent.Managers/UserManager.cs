@@ -53,19 +53,7 @@ namespace CoachAssistent.Managers
                     GroupId = m.GroupId
                 })).ToList();
 
-            var test = dbContext.Members
-                .Include(m => m.Role!.RolePermissions)
-                    .ThenInclude(rp => rp.Action)
-                .Include(m => m.Role!.RolePermissions)
-                    .ThenInclude(rp => rp.Subject)
-                .Include(m => m.Role!.RolePermissions)
-                    .ThenInclude(rp => rp.Fields).ThenInclude(f => f.PermissionField)
-                    .Where(m => m.UserId.Equals(authenticationWrapper.UserId));
-
             return groupPermissions;
-
-            //var editorPermissions = dbContext.Editors
-            //    .Where(e => e.UserId.Equals(authenticationWrapper.UserId))
         }
     }
 }

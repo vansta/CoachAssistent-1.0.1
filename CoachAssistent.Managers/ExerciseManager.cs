@@ -92,48 +92,56 @@ namespace CoachAssistent.Managers
             return exercise.Id;
         }
 
-        public async Task<Guid> UpdateOrCopy(UpdateExerciseViewModel viewModel)
+        //public async Task<Guid> UpdateOrCopy(UpdateExerciseViewModel viewModel)
+        //{
+        //    Exercise? exercise = await dbContext.Exercises
+        //        .Include(e => e.Attachments)
+        //        .Include(e => e.Shareable!.Editors)
+        //        .SingleAsync(e => e.Id.Equals(viewModel.Id));
+
+        //    if (exercise.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId))
+        //    {
+        //        return await Update(viewModel);
+        //    }
+        //    else
+        //    {
+        //        return await Copy(exercise, viewModel);
+        //    }
+        //}
+
+        public async Task<Guid> Copy(Guid exerciseId)
         {
             Exercise? exercise = await dbContext.Exercises
                 .Include(e => e.Attachments)
                 .Include(e => e.Shareable!.Editors)
-                .SingleAsync(e => e.Id.Equals(viewModel.Id));
+                .SingleAsync(e => e.Id.Equals(exerciseId));
 
-            if (exercise.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId))
+            Exercise copy = new Exercise
             {
-                return await Update(viewModel);
-            }
-            else
-            {
-                return await Copy(exercise, viewModel);
-            }
-        }
-
-        private async Task<Guid> Copy(Exercise exercise, UpdateExerciseViewModel viewModel)
-        {
-            Exercise copy = new()
-            {
-                Name = viewModel.Name,
-                Description = viewModel.Description,
+                Name = exercise.Name,
+                Description = exercise.Description,
+                //SharingLevel = viewModel.SharingLevel,
+                Tags = exercise.Tags,
                 Shareable = new Shareable
                 {
-                    SharingLevel = viewModel.SharingLevel,
-                    Editors = CondenseEditors(viewModel.Editors),
+                    SharingLevel = SharingLevel.Public,
+                    Editors = CondenseEditors(null),
                     HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) }
                 }
             };
+            copy = (await dbContext.Exercises.AddAsync(copy)).Entity;
 
-            Guid newId = await Create(copy, viewModel.AddedAttachments);
+            //copy.Attachments = exercise.Attachments()
 
-            foreach (var attachmentId in viewModel.SelectedAttachments)
+            foreach (var originalAttachment in exercise.Attachments)
             {
-                Attachment? originalAttachment = await dbContext.Attachments.SingleAsync(a => a.Id == attachmentId);
+                //Attachment? originalAttachment = await dbContext.Attachments.SingleAsync(a => a.Id == attachmentId);
                 string fromBasePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
-                string toBasePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, newId.ToString());
+                string toBasePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, copy.Id.ToString());
                 AttachmentManager.CopyAttachment(fromBasePath, toBasePath, originalAttachment);
             }
-
-            return newId;
+            await dbContext.SaveChangesAsync();
+            return copy.Id;
         }
 
         public async Task<Guid> Update(UpdateExerciseViewModel viewModel)
