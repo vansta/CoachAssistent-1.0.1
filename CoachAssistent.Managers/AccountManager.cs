@@ -74,7 +74,9 @@ namespace CoachAssistent.Managers
 
         private async Task<LoggedInUserViewModel> Authenticate(CredentialsViewModel credentials)
         {
-            User? user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName.Equals(credentials.UserName));
+            User? user = await dbContext.Users
+                .Include(u => u.Memberships)
+                .FirstOrDefaultAsync(u => u.UserName.Equals(credentials.UserName));
             if (user == null)
             {
                 throw new Exception($"No user found for {credentials.UserName}");

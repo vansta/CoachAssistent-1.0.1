@@ -24,7 +24,9 @@ namespace CoachAssistent.Managers
         {
             IQueryable<Exercise> exercises = dbContext.Exercises
                 .Include(e => e.Attachments)
-                .Include(e => e.Tags);
+                .Include(e => e.Tags)
+                .Include(e => e.Shareable!.ShareablesXGroups)
+                .Include(e => e.Shareable!.Editors);
 
             if (search is not null)
             {

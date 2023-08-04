@@ -14,7 +14,7 @@ namespace CoachAssistent.Models.ViewModels.Permission
         }
         public string? Action { get; set; }
         public string? Subject { get; set; }
-        public IEnumerable<Guid>? Ids { get; set; }
-        public IEnumerable<string>? Fields { get; set; }
+        public Guid GroupId { get; set; }
+        public IEnumerable<string?> Fields { get; set; } = new List<string?>();
     }
 }

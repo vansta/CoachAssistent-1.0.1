@@ -87,9 +87,9 @@ namespace CoachAssistent.Data
                 .HasOne(hl => hl.Origin)
                 .WithMany(s => s.Copies);
 
-            Guid adminId = Guid.NewGuid();
-            Guid writerId = Guid.NewGuid();
-            Guid readerId = Guid.NewGuid();
+            Guid adminId = new Guid("5E8876EE-A3F0-4714-9566-22411FAA32D4");
+            Guid writerId = new Guid("4948B3BA-6061-4995-AC82-2DA4885839E5");
+            Guid readerId = new Guid("AE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
             modelBuilder.Entity<Role>()
                 .HasData(new Role
                 {
@@ -133,21 +133,11 @@ namespace CoachAssistent.Data
                 .HasData(new PermissionSubject
                 {
                     Id = 1,
-                    Name = "exercise"
+                    Name = "shareable"
                 },
                 new PermissionSubject
                 {
                     Id = 2,
-                    Name = "segment"
-                },
-                new PermissionSubject
-                {
-                    Id = 3,
-                    Name = "training"
-                },
-                new PermissionSubject
-                {
-                    Id = 4,
                     Name = "group"
                 });
 
@@ -157,6 +147,27 @@ namespace CoachAssistent.Data
                     Id = 1,
                     RoleId = adminId,
                     ActionId = 1,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 2,
+                    RoleId = adminId,
+                    ActionId = 2,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 3,
+                    RoleId = adminId,
+                    ActionId = 3,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 4,
+                    RoleId = adminId,
+                    ActionId = 4,
                     SubjectId = 1
                 });
         }

@@ -44,6 +44,7 @@ namespace CoachAssistent.Managers
             {
                 Guid userId = authenticationWrapper.UserId;
                 IEnumerable<Guid> groupIds = authenticationWrapper.User.GroupIds;
+                var test = collection.First();
                 collection = collection
                     .Where(c =>
                         c.Shareable != null &&

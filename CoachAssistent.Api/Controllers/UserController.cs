@@ -5,6 +5,7 @@ using CoachAssistent.Managers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using CoachAssistent.Models.ViewModels;
+using CoachAssistent.Models.ViewModels.Permission;
 
 namespace CoachAssistent.Api.Controllers
 {
@@ -33,9 +34,9 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpGet("Permissions")]
-        public void GetPermissions()
+        public IEnumerable<RolePermissionViewModel> GetPermissions()
         {
-            userManager.GetPermissions();
+            return userManager.GetPermissions();
         }
     }
 }
