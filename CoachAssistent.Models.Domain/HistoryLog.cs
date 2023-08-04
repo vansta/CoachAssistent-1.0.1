@@ -13,7 +13,7 @@ namespace CoachAssistent.Models.Domain
         {
 
         }
-        public HistoryLog(EditActionType editAction, Guid userId, Guid? originId)
+        public HistoryLog(EditActionType editAction, Guid userId, Guid? originId = null)
         {
             Timestamp = DateTime.Now;
             EditActionType = editAction;
@@ -24,10 +24,12 @@ namespace CoachAssistent.Models.Domain
         public Guid Id { get; set; }
         public DateTime Timestamp { get; set; }
         public EditActionType EditActionType { get; set; }
+        public Guid ShareableId { get; set; }
         public Guid? OriginId { get; set; }
-
-        public int HistoryId { get; set; }
-
         public Guid UserId { get; set; }
+
+        public Shareable? Shareable { get; set; }
+        public Shareable? Origin { get; set; }
+        public User? User { get; set; }
     }
 }

@@ -45,10 +45,14 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                Exercises = exercises.ToHashSet()
+                Exercises = exercises.ToHashSet(),
+                Shareable = new Shareable
+                {
+                    SharingLevel = viewModel.SharingLevel,
+                    Editors = CondenseEditors(viewModel.Editors),
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) }
+                }
             };
-            segment.Editors = CondenseEditors(segment, viewModel.Editors);
-            segment.HistoryId = await AddHistoryLog(0, EditActionType.Edit);
             segment = (await dbContext.Segments.AddAsync(segment)).Entity;
             await dbContext.SaveChangesAsync();
 
@@ -59,17 +63,18 @@ namespace CoachAssistent.Managers
         {
             Segment segment = await dbContext.Segments
                 .Include(s => s.Exercises)
+                .Include(s => s.Shareable!.Editors)
                 .SingleAsync(s => s.Id.Equals(viewModel.Id));
 
             segment.Name = viewModel.Name;
             segment.Description = viewModel.Description;
 
-            await AddHistoryLog(segment.HistoryId, EditActionType.Edit);
+            await AddHistoryLog(segment.ShareableId, EditActionType.Edit);
 
             segment.Exercises = dbContext
                 .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
 
-            segment.Editors = CondenseEditors(segment, viewModel.Editors);
+            segment.Shareable!.Editors = CondenseEditors(viewModel.Editors, segment.Shareable);
             await dbContext.SaveChangesAsync();
         }
 
@@ -78,7 +83,7 @@ namespace CoachAssistent.Managers
             Segment? segment = await dbContext.Segments.FindAsync(id);
             if (segment is not null)
             {
-                await AddHistoryLog(segment.HistoryId, EditActionType.Delete);
+                await AddHistoryLog(segment.ShareableId, EditActionType.Delete);
                 segment.DeletedTS = DateTime.Now;
                 await dbContext.SaveChangesAsync();
             }

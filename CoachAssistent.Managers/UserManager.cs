@@ -22,29 +22,10 @@ namespace CoachAssistent.Managers
             this.configuration = configuration;
         }
 
-        public IEnumerable<Guid> GetAssignedEditors(Guid id, string? type)
+        public IEnumerable<Guid> GetAssignedEditors(Guid id)
         {
-            IQueryable<Editor> assingedEditors = dbContext.Editors;
-            switch (type)
-            {
-                case "exercise":
-                    assingedEditors = assingedEditors.Where(e => e.ExerciseId.HasValue && e.ExerciseId.Equals(id));
-                    break;
-                case "segment":
-                    assingedEditors = assingedEditors.Where(e => e.SegmentId.HasValue && e.SegmentId.Equals(id));
-                    break;
-                case "training":
-                    assingedEditors = assingedEditors.Where(e => e.TrainingId.HasValue && e.TrainingId.Equals(id));
-                    break;
-                default:
-                    assingedEditors = assingedEditors.Where(e => 
-                        e.ExerciseId.HasValue && e.ExerciseId.Equals(id)
-                        || e.SegmentId.HasValue && e.SegmentId.Equals(id)
-                        || e.TrainingId.HasValue && e.TrainingId.Equals(id)
-                    );
-                    break;
-            };
-            return assingedEditors
+            return dbContext.Editors
+                .Where(e => e.ShareableId.Equals(id))
                 .Select(e => e.UserId);
         }
 
@@ -55,14 +36,15 @@ namespace CoachAssistent.Managers
 
         public void GetPermissions()
         {
-            var groupPermissions = dbContext.Members
-                .Where(m => m.UserId.Equals(authenticationWrapper.UserId))
-                .SelectMany(m =>
-                {
-                    m.Role.RolePermissions.Select(rp => new RolePermissionViewModel(rp.Action, rp.Subject, m.GroupId, rp.Fields))
-                })
-                .SelectMany(m => m.Role!.RolePermissions)
-                .Select(rp => rp.Action.Name, )
+            //var groupPermissions = dbContext.Members
+            //    .Where(m => m.UserId.Equals(authenticationWrapper.UserId))
+            //    .SelectMany(m =>
+            //    {
+            //        m.Role.RolePermissions.Select(rp => new RolePermissionViewModel(rp.Action, rp.Subject, m.GroupId, rp.Fields))
+            //    });
+
+            //var editorPermissions = dbContext.Editors
+            //    .Where(e => e.UserId.Equals(authenticationWrapper.UserId))
         }
     }
 }

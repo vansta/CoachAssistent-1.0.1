@@ -13,6 +13,7 @@ namespace CoachAssistent.Models.ViewModels.Exercise
         public string? Name { get; set; }
         public string? Description { get; set; }
         public string? SharingLevel { get; set; }
+        public Guid ShareableId { get; set; }
         public IEnumerable<Guid>? Attachments { get; set; }
         public IEnumerable<string> Tags { get; set; } = null!;
     }

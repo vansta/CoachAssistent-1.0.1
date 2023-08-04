@@ -27,15 +27,15 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpGet("AssignedEditors")]
-        public IEnumerable<Guid> GetAssignedEditors(Guid id, string? type = null)
+        public IEnumerable<Guid> GetAssignedEditors(Guid shareableId)
         {
-            return userManager.GetAssignedEditors(id, type);
+            return userManager.GetAssignedEditors(shareableId);
         }
 
         [HttpGet("Permissions")]
         public void GetPermissions()
         {
-
+            userManager.GetPermissions();
         }
     }
 }

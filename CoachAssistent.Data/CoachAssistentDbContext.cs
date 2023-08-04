@@ -19,15 +19,14 @@ namespace CoachAssistent.Data
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Training> Trainings => Set<Training>();
         public DbSet<User> Users => Set<User>();
-        public DbSet<SharablesXGroups> SharablesXGroups => Set<SharablesXGroups>();
+        public DbSet<ShareablesXGroups> SharablesXGroups => Set<ShareablesXGroups>();
         public DbSet<SegmentXExercise> SegmentsXExercises => Set<SegmentXExercise>();
         public DbSet<TrainingXSegment> TrainingsXSegments => Set<TrainingXSegment>();
         public DbSet<Editor> Editors => Set<Editor>();
         public DbSet<Member> Members => Set<Member>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<HistoryLog> HistoryLogs => Set<HistoryLog>();
-        public DbSet<History> Histories => Set<History>();
-
+        public DbSet<Shareable> Shareables => Set<Shareable>();
         public DbSet<PermissionAction> PermissionActions => Set<PermissionAction>();
         public DbSet<PermissionSubject> PermissionSubjects => Set<PermissionSubject>();
         public DbSet<PermissionField> PermissionFields => Set<PermissionField>();
@@ -83,6 +82,10 @@ namespace CoachAssistent.Data
                 .HasOne(se => se.PermissionField)
                 .WithMany(s => s.RolePermissions)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<HistoryLog>()
+                .HasOne(hl => hl.Origin)
+                .WithMany(s => s.Copies);
 
             Guid adminId = Guid.NewGuid();
             Guid writerId = Guid.NewGuid();

@@ -53,14 +53,16 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                //Exercises = exercises.ToHashSet(),
-                //UserId = authenticationWrapper.UserId,
-                Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
-                VersionTS = DateTime.Now
+                //Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
+                Shareable = new Shareable
+                {
+                    //SharingLevel = viewModel.
+                    //Editors = CondenseEditors(viewModel.Editors),
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) }
+                }
             };
             training.Segments = dbContext
                 .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
-            training.HistoryId = await AddHistoryLog(training.HistoryId, EditActionType.Edit);
             training = (await dbContext.Trainings.AddAsync(training)).Entity;
             await dbContext.SaveChangesAsync();
 
@@ -76,12 +78,11 @@ namespace CoachAssistent.Managers
 
             training.Name = viewModel.Name;
             training.Description = viewModel.Description;
-            training.VersionTS = DateTime.Now;
 
             training.Segments = dbContext
                 .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
 
-            await AddHistoryLog(training.HistoryId, EditActionType.Edit);
+            await AddHistoryLog(training.ShareableId, EditActionType.Edit);
 
             await dbContext.SaveChangesAsync();
         }
@@ -91,7 +92,7 @@ namespace CoachAssistent.Managers
             Training? training = await dbContext.Trainings.FindAsync(id);
             if (training is not null)
             {
-                await AddHistoryLog(training.HistoryId, EditActionType.Edit);
+                await AddHistoryLog(training.ShareableId, EditActionType.Edit);
                 training.DeletedTS = DateTime.Now;
                 await dbContext.SaveChangesAsync();
             }

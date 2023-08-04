@@ -32,13 +32,13 @@ namespace CoachAssistent.Managers
         //    }
         //}
 
-        public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : ISharable
+        public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : IShareable
         {
             collection = collection
                 .Where(c => !c.DeletedTS.HasValue);
             if (!authenticationWrapper.IsLoggedIn)
             {
-                collection = collection.Where(c => c.SharingLevel == SharingLevel.Public);
+                collection = collection.Where(c => c.Shareable!.SharingLevel == SharingLevel.Public);
             }
             else
             {
@@ -46,32 +46,32 @@ namespace CoachAssistent.Managers
                 IEnumerable<Guid> groupIds = authenticationWrapper.User.GroupIds;
                 collection = collection
                     .Where(c =>
+                        c.Shareable != null &&
+                        (
                         //public
-                        (c.SharingLevel == SharingLevel.Public)
+                        (c.Shareable!.SharingLevel == SharingLevel.Public)
                     ||
                         //private
-                        (c.SharingLevel == SharingLevel.Private && c.Editors.Select(e => e.UserId).Contains(userId))
+                        (c.Shareable.SharingLevel == SharingLevel.Private && c.Shareable.Editors.Select(e => e.UserId).Contains(userId))
                     ||
                         //group
-                        (c.SharingLevel == SharingLevel.Group
-                            && c.SharablesXGroups.Any(sg => groupIds.Contains(sg.GroupId))
-                            //&& c.User != null
-                            //&& c.User.Groups.Select(ug => ug.Id).Any(ugi => groupIds.Contains(ugi))
+                        (c.Shareable.SharingLevel == SharingLevel.Group
+                            && c.Shareable.ShareablesXGroups.Any(sg => groupIds.Contains(sg.GroupId))
                         )
-                    );
+                    ));
             }
 
             return collection;
         }
 
-        internal async Task<int> AddHistoryLog(int historyId, EditActionType editActionType, Guid? originId = null)
+        internal async Task<Guid> AddHistoryLog(Guid shareableId, EditActionType editActionType, Guid? originId = null)
         {
-            History? history = await dbContext.Histories.FindAsync(historyId);
-            history ??= (await dbContext.Histories.AddAsync(new History())).Entity;
-            history.HistoryLogs.Add(new HistoryLog(editActionType, authenticationWrapper.UserId, originId));
+            Shareable? shareable = await dbContext.Shareables.FindAsync(shareableId);
+            shareable ??= (await dbContext.Shareables.AddAsync(new Shareable())).Entity;
+            shareable.HistoryLogs.Add(new HistoryLog(editActionType, authenticationWrapper.UserId, originId));
             await dbContext.SaveChangesAsync();
 
-            return history.Id;
+            return shareable.Id;
         }
 
         internal ICollection<Tag> CondenseTags(IEnumerable<string>? tags)
@@ -83,11 +83,11 @@ namespace CoachAssistent.Managers
             }).ToList() ?? new List<Tag>();
         }
 
-        internal ICollection<Editor> CondenseEditors(ISharable sharable, IEnumerable<Guid>? editors)
+        internal ICollection<Editor> CondenseEditors(IEnumerable<Guid>? editors, Shareable? sharable = null)
         {
             if (editors is null || !editors.Any())
             {
-                if (sharable.Editors.Count > 0)
+                if (sharable is not null && sharable.Editors.Count > 0)
                 {
                     return sharable.Editors;
                 }
@@ -100,7 +100,7 @@ namespace CoachAssistent.Managers
 
             return editors.Select(x =>
             {
-                Editor? editor = sharable.Editors.FirstOrDefault(e => e.UserId.Equals(x));
+                Editor? editor = sharable?.Editors.FirstOrDefault(e => e.UserId.Equals(x));
                 return editor ?? new Editor { UserId = x };
             }).ToList();
         }

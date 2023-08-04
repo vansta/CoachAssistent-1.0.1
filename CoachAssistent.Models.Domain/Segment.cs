@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.Domain
 {
-    public class Segment : ISharable
+    public class Segment : IShareable
     {
         public Segment()
         {
@@ -16,30 +16,21 @@ namespace CoachAssistent.Models.Domain
             Exercises = new HashSet<Exercise>();
             Trainings = new HashSet<Training>();
             Tags = new HashSet<Tag>();
-            SharablesXGroups = new HashSet<SharablesXGroups>();
             SegmentsXExercises = new HashSet<SegmentXExercise>();
             TrainingsXSegments = new HashSet<TrainingXSegment>();
-            Editors = new HashSet<Editor>();
-            //History = new HashSet<HistoryLog>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
         public string Name { get; set; }
         public string? Description { get; set; }
-
-        public SharingLevel SharingLevel { get; set; }
-
         public DateTime? DeletedTS { get; set; }
-        public int HistoryId { get; set; }
 
-        public History? History { get; set; }
-        public ICollection<Editor> Editors { get; set; }
+        public Guid ShareableId { get; set; }
+        public Shareable? Shareable { get; set; }
         public ICollection<Exercise> Exercises { get; set; }
         public ICollection<Training> Trainings { get; set; }
         public ICollection<Tag> Tags { get; set; }
-        public ICollection<SharablesXGroups> SharablesXGroups { get; set; }
         public ICollection<SegmentXExercise> SegmentsXExercises { get; set; }
         public ICollection<TrainingXSegment> TrainingsXSegments { get; set; }
-        //public ICollection<HistoryLog> History { get; set; }
     }
 }

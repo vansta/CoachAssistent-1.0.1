@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.Domain
 {
-    public class Editor
+    public class ShareablesXGroups
     {
         public Guid Id { get; set; }
-        public Guid UserId { get; set; }
         public Guid ShareableId { get; set; }
-
-        public User? User { get; set; }
+        public Guid GroupId { get; set; }
 
         public Shareable? Shareable { get; set; }
+        public Group? Group { get; set; }
     }
 }

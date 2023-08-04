@@ -1,4 +1,5 @@
-﻿using CoachAssistent.Models.ViewModels.Exercise;
+﻿using CoachAssistent.Common.Enums;
+using CoachAssistent.Models.ViewModels.Exercise;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace CoachAssistent.Models.ViewModels.Segment
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public string? SharingLevel { get; set; }
+        public SharingLevel SharingLevel { get; set; }
         public ICollection<ExerciseOverviewItemViewModel> Exercises { get; set; }
         public ICollection<Guid> Editors { get; set; }
     }

@@ -62,12 +62,16 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                SharingLevel = viewModel.SharingLevel,
-                Tags = CondenseTags(viewModel.Tags)
+                //SharingLevel = viewModel.SharingLevel,
+                Tags = CondenseTags(viewModel.Tags),
+                Shareable = new Shareable
+                {
+                    SharingLevel = viewModel.SharingLevel,
+                    Editors = CondenseEditors(viewModel.Editors),
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) }
+                }
             };
 
-            exercise.Editors = CondenseEditors(exercise, viewModel.Editors);
-            exercise.HistoryId = await AddHistoryLog(0, EditActionType.Create);
             return await Create(exercise, viewModel.AddedAttachments);
         }
 
@@ -90,10 +94,10 @@ namespace CoachAssistent.Managers
         {
             Exercise? exercise = await dbContext.Exercises
                 .Include(e => e.Attachments)
-                .Include(e => e.Editors)
+                .Include(e => e.Shareable!.Editors)
                 .SingleAsync(e => e.Id.Equals(viewModel.Id));
 
-            if (exercise.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId))
+            if (exercise.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId))
             {
                 return await Update(viewModel);
             }
@@ -109,11 +113,14 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                SharingLevel = viewModel.SharingLevel
+                Shareable = new Shareable
+                {
+                    SharingLevel = viewModel.SharingLevel,
+                    Editors = CondenseEditors(viewModel.Editors),
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) }
+                }
             };
 
-            copy.Editors = CondenseEditors(copy, viewModel.Editors);
-            copy.HistoryId = await AddHistoryLog(0, EditActionType.Copy, exercise.Id);
             Guid newId = await Create(copy, viewModel.AddedAttachments);
 
             foreach (var attachmentId in viewModel.SelectedAttachments)
@@ -132,17 +139,18 @@ namespace CoachAssistent.Managers
             Exercise? exercise = await dbContext.Exercises
                 .Include(e => e.Attachments)
                 .Include(e => e.Tags)
-                .Include(e => e.Editors)
+                .Include(e => e.Shareable!.Editors)
                 .SingleAsync(e => e.Id.Equals(viewModel.Id));
 
             exercise.Name = viewModel.Name;
             exercise.Description = viewModel.Description;
-            exercise.SharingLevel = viewModel.SharingLevel;
             exercise.Tags = CondenseTags(viewModel.Tags);
 
-            exercise.Editors = CondenseEditors(exercise, viewModel.Editors);
+            exercise.Shareable!.SharingLevel = viewModel.SharingLevel;
 
-            await AddHistoryLog(exercise.HistoryId, EditActionType.Edit);
+            exercise.Shareable.Editors = CondenseEditors(viewModel.Editors, exercise.Shareable);
+
+            await AddHistoryLog(exercise.ShareableId, EditActionType.Edit);
 
             string basePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
             Directory.CreateDirectory(basePath);
@@ -176,7 +184,7 @@ namespace CoachAssistent.Managers
             if (exercise is not null)
             {
                 exercise.DeletedTS = DateTime.Now;
-                await AddHistoryLog(exercise.HistoryId, EditActionType.Delete);
+                await AddHistoryLog(exercise.ShareableId, EditActionType.Delete);
                 await dbContext.SaveChangesAsync();
             }
         }

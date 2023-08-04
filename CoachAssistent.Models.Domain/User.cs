@@ -12,9 +12,6 @@ namespace CoachAssistent.Models.Domain
             Key = new byte[32];
 
             Memberships = new HashSet<Member>();
-            //Exercises = new HashSet<Exercise>();
-            //Segments = new HashSet<Segment>();
-            //Trainings = new HashSet<Training>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]

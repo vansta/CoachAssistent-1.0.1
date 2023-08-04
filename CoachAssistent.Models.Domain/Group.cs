@@ -14,7 +14,7 @@ namespace CoachAssistent.Models.Domain
             Name = string.Empty;
             Members = new HashSet<Member>();
             Tags = new HashSet<Tag>();
-            SharablesXGroups = new HashSet<SharablesXGroups>();
+            ShareablesXGroups = new HashSet<ShareablesXGroups>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -24,6 +24,6 @@ namespace CoachAssistent.Models.Domain
 
         public ICollection<Member> Members { get; set; }
         public ICollection<Tag> Tags { get; set; }
-        public ICollection<SharablesXGroups> SharablesXGroups { get; set; }
+        public ICollection<ShareablesXGroups> ShareablesXGroups { get; set; }
     }
 }
