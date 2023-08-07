@@ -26,10 +26,28 @@ namespace CoachAssistent.Api.Controllers
             return groupManager.GetGroupsForUser();
         }
 
+        [HttpGet("Overview")]
+        public OverviewViewModel<GroupOverviewItemViewModel> GetGroups()
+        {
+            return groupManager.GetGroups();
+        }
+
+        [HttpGet("Details")]
+        public Task<EditGroupViewModel> GetGroup(Guid id)
+        {
+            return groupManager.GetGroup(id);
+        }
+
         [HttpPost]
         public Task<Guid> CreateGroup(CreateGroupViewModel createGroupViewModel)
         {
             return groupManager.CreateGroup(createGroupViewModel);
+        }
+
+        [HttpPut]
+        public async Task UpdateGroup(EditGroupViewModel editGroupViewModel)
+        {
+            await groupManager.UpdateGroup(editGroupViewModel);
         }
     }
 }

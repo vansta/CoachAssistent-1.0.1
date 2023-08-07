@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
+using CoachAssistent.Data.Migrations;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
@@ -48,6 +49,62 @@ namespace CoachAssistent.Managers
             await dbContext.SaveChangesAsync();
 
             return addGroup.Entity.Id;
+        }
+
+        public OverviewViewModel<GroupOverviewItemViewModel> GetGroups()
+        {
+            return new OverviewViewModel<GroupOverviewItemViewModel>
+            {
+                Items = dbContext.Groups
+                    .Include(g => g.Tags)
+                    .Where(g => g.Members.Select(m => m.UserId).Contains(authenticationWrapper.UserId))
+                    .Select(g => mapper.Map<GroupOverviewItemViewModel>(g))
+            };
+        }
+
+        public async Task<EditGroupViewModel> GetGroup(Guid id)
+        {
+            Group group = await dbContext.Groups
+                .Include(g => g.Members)
+                .Include(g => g.Tags)
+                .SingleAsync(g => g.Id.Equals(id));
+
+            return mapper.Map<EditGroupViewModel>(group);
+        }
+
+        public async Task UpdateGroup(EditGroupViewModel editGroupViewModel)
+        {
+            Group group = await dbContext.Groups
+                .Include(g => g.Members)
+                .Include(g => g.Tags)
+                .SingleAsync(g => g.Id.Equals(editGroupViewModel.Id));
+
+            group.Name = editGroupViewModel.Name ?? "New group";
+            group.Description = editGroupViewModel.Description;
+            group.Tags = CondenseTags(editGroupViewModel.Tags);
+
+            if (editGroupViewModel.Members is not null && editGroupViewModel.Members.Any())
+            {
+                group.Members = editGroupViewModel.Members.Select(x =>
+                {
+                    Member? member = group.Members.FirstOrDefault(m => m.UserId.Equals(x.UserId));
+                    if (member is not null)
+                    {
+                        member.RoleId = x.RoleId;
+                    }
+                    else
+                    {
+                        member = new Member
+                        {
+                            UserId = x.UserId,
+                            RoleId = x.RoleId
+                        };
+                    }
+                    return member;
+                }).ToList();
+            };
+
+            await dbContext.SaveChangesAsync();
         }
     }
 }
