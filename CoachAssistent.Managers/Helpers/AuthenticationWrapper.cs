@@ -17,6 +17,7 @@ namespace CoachAssistent.Managers.Helpers
         }
 
         public Guid UserId => _contextAccessor.UserId();
+        public int LicenseLevel => _contextAccessor.LicenseLevel();
 
         public bool IsLoggedIn => _contextAccessor.IsLoggedIn();
 
@@ -26,6 +27,7 @@ namespace CoachAssistent.Managers.Helpers
     public interface IAuthenticationWrapper
     {
         public Guid UserId { get; }
+        public int LicenseLevel { get; }
         public bool IsLoggedIn { get; }
         public LoggedInUserViewModel User { get; }
     }

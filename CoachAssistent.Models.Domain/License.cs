@@ -5,16 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CoachAssistent.Models.Domain.Permissions
+namespace CoachAssistent.Models.Domain
 {
-    public class PermissionSubject
+    public class License
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         [MaxLength(64)]
         public string Name { get; set; } = null!;
-        [MaxLength(128)]
+        [MaxLength(1024)]
         public string? Description { get; set; }
-
-        public ICollection<PermissionField> Fields { get; set; } = new HashSet<PermissionField>();
+        public int Level { get; set; }
     }
 }

@@ -50,7 +50,7 @@ namespace CoachAssistent.Managers
                 {
                     Action = rp.Action!.Name,
                     Subject = rp.Subject!.Name,
-                    Reason = null,
+                    Reason = rp.Reason,
                     Fields = rp.Fields.Select(f => f.PermissionField!.Name),
                     GroupIds = new List<Guid> { m.GroupId }
                 })).ToList();
@@ -71,12 +71,6 @@ namespace CoachAssistent.Managers
                 Subject = rp.Subject!.Name,
                 UserId = authenticationWrapper.UserId
             }));
-
-            groupPermissions.Add(new RolePermissionViewModel
-            {
-                Action = "test",
-                Subject = "shareable"
-            });
 
             return groupPermissions;
         }

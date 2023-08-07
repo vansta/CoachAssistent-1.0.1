@@ -16,6 +16,13 @@ namespace CoachAssistent.Managers.Helpers
             string? userId = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             return Guid.TryParse(userId, out Guid id) ? id : Guid.Empty;
         }
+
+        public static int LicenseLevel(this IHttpContextAccessor contextAccessor)
+        {
+            var claims = contextAccessor.HttpContext.User.Claims;
+            string? licenseLevel = claims.FirstOrDefault(c => c.Type == CustomClaimTypes.License)?.Value;
+            return int.TryParse(licenseLevel, out int level) ? level : 0;
+        }
         public static LoggedInUserViewModel GetCurrentUser(this IHttpContextAccessor contextAccessor)
         {
             var claims = contextAccessor.HttpContext.User.Claims;
@@ -48,5 +55,6 @@ namespace CoachAssistent.Managers.Helpers
         public static string Name { get { return "name"; } }
         public static string Email { get { return "email"; } }
         public static string Group { get { return "Group"; } }
+        public static string License { get { return "License"; } }
     }
 }

@@ -59,7 +59,8 @@ namespace CoachAssistent.Managers.Helpers
                 new Claim(ClaimTypes.Name, user.UserName ?? ""),
                 new Claim(CustomClaimTypes.Name, user.UserName ?? ""),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim(CustomClaimTypes.Email, user.Email ?? "")
+                new Claim(CustomClaimTypes.Email, user.Email ?? ""),
+                new Claim(CustomClaimTypes.License, user.LicenseLevel ?? ""),
             };
 
             claims.AddRange(user.GroupIds.Select(gi => new Claim(CustomClaimTypes.Group, gi.ToString())));

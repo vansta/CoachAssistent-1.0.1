@@ -57,7 +57,10 @@ namespace CoachAssistent.Managers
                 FirstName = registerData.FirstName,
                 LastName = registerData.LastName,
                 CreationDate = DateTime.Now,
-                LastUpdate = DateTime.Now
+                LastUpdate = DateTime.Now,
+                LicenseId = dbContext.Licenses
+                    .OrderBy(l => l.Level)
+                    .First().Id
             };
 
             using (Rfc2898DeriveBytes rfc2898DeriveBytes = new(registerData.PasswordHash, saltSize, iterations, hashAlgorithmName))
@@ -76,6 +79,7 @@ namespace CoachAssistent.Managers
         {
             User? user = await dbContext.Users
                 .Include(u => u.Memberships)
+                .Include(u => u.License)
                 .FirstOrDefaultAsync(u => u.UserName.Equals(credentials.UserName));
             if (user == null)
             {

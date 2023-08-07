@@ -19,6 +19,7 @@ namespace CoachAssistent.Data
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Training> Trainings => Set<Training>();
         public DbSet<User> Users => Set<User>();
+        public DbSet<License> Licenses => Set<License>();
         public DbSet<ShareablesXGroups> ShareablesXGroups => Set<ShareablesXGroups>();
         public DbSet<SegmentXExercise> SegmentsXExercises => Set<SegmentXExercise>();
         public DbSet<TrainingXSegment> TrainingsXSegments => Set<TrainingXSegment>();
@@ -87,6 +88,25 @@ namespace CoachAssistent.Data
                 .HasOne(hl => hl.Origin)
                 .WithMany(s => s.Copies);
 
+            Guid adminLicenseId = new Guid("c7b16ea3-26db-4ad0-a66d-697e453d8b0c");
+            Guid freeLicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c");
+
+            modelBuilder.Entity<License>()
+                .HasData(new License
+                {
+                    Id = adminLicenseId,
+                    Name = "Administrator",
+                    Description = "Hands off!",
+                    Level = 99
+                },
+                new License
+                {
+                    Id = freeLicenseId,
+                    Name = "Free user",
+                    Description = "Default license",
+                    Level = 1
+                });
+
             Guid adminId = new Guid("5E8876EE-A3F0-4714-9566-22411FAA32D4");
             Guid writerId = new Guid("4948B3BA-6061-4995-AC82-2DA4885839E5");
             Guid readerId = new Guid("AE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
@@ -96,25 +116,33 @@ namespace CoachAssistent.Data
                 {
                     Id = adminId,
                     Name = "Administrator",
-                    Description = "An administrator can edit everything"
+                    Description = "An administrator can edit everything",
+                    Index = 0,
+                    MinimalLicenseLevel = 1
                 },
                 new Role
                 {
                     Id = writerId,
                     Name = "Writer",
-                    Description = "A writer can edit and create"
+                    Description = "A writer can edit and create",
+                    Index = 2,
+                    MinimalLicenseLevel = 1
                 },
                 new Role
                 {
                     Id = readerId,
                     Name = "Reader",
-                    Description = "A reader can read"
+                    Description = "A reader can read",
+                    Index = 3,
+                    MinimalLicenseLevel = 1
                 },
                 new Role
                 {
                     Id = editorId,
                     Name = "Editor",
-                    Description = "An editor owns an exercise, segment or training"
+                    Description = "An editor owns an exercise, segment or training",
+                    Index = 99,
+                    MinimalLicenseLevel = 99
                 });
             modelBuilder.Entity<PermissionAction>()
                 .HasData(new PermissionAction
@@ -151,6 +179,34 @@ namespace CoachAssistent.Data
                 {
                     Id = 2,
                     Name = "group"
+                });
+
+            modelBuilder.Entity<PermissionField>()
+                .HasData(new PermissionField
+                {
+                    Id = 1,
+                    Name = "Name",
+                    Description = "Name",
+                    SubjectId = 1
+                },
+                new PermissionField
+                {
+                    Id = 2,
+                    Name = "Description",
+                    SubjectId = 1
+                },
+                new PermissionField
+                {
+                    Id = 3,
+                    Name = "Name",
+                    Description = "Name",
+                    SubjectId = 2
+                },
+                new PermissionField
+                {
+                    Id = 4,
+                    Name = "Description",
+                    SubjectId = 2
                 });
 
             modelBuilder.Entity<RolePermission>()

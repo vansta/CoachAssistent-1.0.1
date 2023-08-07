@@ -4,6 +4,7 @@ using CoachAssistent.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    partial class CoachAssistentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230807115802_License")]
+    partial class License
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,34 +290,6 @@ namespace CoachAssistent.Data.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("PermissionFields");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Name",
-                            Name = "Name",
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Description",
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Name",
-                            Name = "Name",
-                            SubjectId = 2
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Description",
-                            SubjectId = 2
-                        });
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionSubject", b =>
@@ -369,7 +344,7 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("SubjectId")
+                    b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -906,7 +881,9 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionSubject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SubjectId");
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Action");
 
