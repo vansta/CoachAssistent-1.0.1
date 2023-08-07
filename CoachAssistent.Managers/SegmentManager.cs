@@ -19,7 +19,8 @@ namespace CoachAssistent.Managers
         public OverviewViewModel<SegmentOverviewItemViewModel> GetSegments()
         {
             IQueryable<Segment> segments = dbContext.Segments
-                .Include(s => s.Exercises);
+                .Include(s => s.Exercises)
+                .Include(s => s.Shareable!.ShareablesXGroups);
             segments = FilterBySharingLevel(segments);
             return new OverviewViewModel<SegmentOverviewItemViewModel>
             {
@@ -33,6 +34,7 @@ namespace CoachAssistent.Managers
         {
             Segment? segment = await dbContext.Segments
                 .Include(s => s.Exercises).ThenInclude(e => e.Attachments)
+                .Include(s => s.Shareable!.ShareablesXGroups)
                 .SingleAsync(s => s.Id.Equals(id));
             return mapper.Map<SegmentViewModel>(segment);
         }
@@ -48,7 +50,7 @@ namespace CoachAssistent.Managers
                 Exercises = exercises.ToHashSet(),
                 Shareable = new Shareable
                 {
-                    SharingLevel = viewModel.SharingLevel,
+                    SharingLevel = (SharingLevel)viewModel.SharingLevel,
                     Editors = CondenseEditors(viewModel.Editors),
                     HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) }
                 }

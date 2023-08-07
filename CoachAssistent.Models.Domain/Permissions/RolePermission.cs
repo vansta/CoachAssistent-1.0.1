@@ -13,6 +13,7 @@ namespace CoachAssistent.Models.Domain.Permissions
         public int ActionId { get; set; }
         public int SubjectId { get; set; }
 
+        public Role? Role { get; set; }
         public PermissionAction? Action { get; set; }
         public PermissionSubject? Subject { get; set; }
 

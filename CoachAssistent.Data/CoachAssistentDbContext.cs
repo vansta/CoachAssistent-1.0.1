@@ -19,7 +19,7 @@ namespace CoachAssistent.Data
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Training> Trainings => Set<Training>();
         public DbSet<User> Users => Set<User>();
-        public DbSet<ShareablesXGroups> SharablesXGroups => Set<ShareablesXGroups>();
+        public DbSet<ShareablesXGroups> ShareablesXGroups => Set<ShareablesXGroups>();
         public DbSet<SegmentXExercise> SegmentsXExercises => Set<SegmentXExercise>();
         public DbSet<TrainingXSegment> TrainingsXSegments => Set<TrainingXSegment>();
         public DbSet<Editor> Editors => Set<Editor>();
@@ -90,6 +90,7 @@ namespace CoachAssistent.Data
             Guid adminId = new Guid("5E8876EE-A3F0-4714-9566-22411FAA32D4");
             Guid writerId = new Guid("4948B3BA-6061-4995-AC82-2DA4885839E5");
             Guid readerId = new Guid("AE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
+            Guid editorId = new Guid("BE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
             modelBuilder.Entity<Role>()
                 .HasData(new Role
                 {
@@ -108,6 +109,12 @@ namespace CoachAssistent.Data
                     Id = readerId,
                     Name = "Reader",
                     Description = "A reader can read"
+                },
+                new Role
+                {
+                    Id = editorId,
+                    Name = "Editor",
+                    Description = "An editor owns an exercise, segment or training"
                 });
             modelBuilder.Entity<PermissionAction>()
                 .HasData(new PermissionAction
@@ -128,6 +135,11 @@ namespace CoachAssistent.Data
                 {
                     Id = 4,
                     Name = "delete"
+                },
+                new PermissionAction
+                {
+                    Id = 5,
+                    Name = "editShareability"
                 });
             modelBuilder.Entity<PermissionSubject>()
                 .HasData(new PermissionSubject
@@ -168,6 +180,49 @@ namespace CoachAssistent.Data
                     Id = 4,
                     RoleId = adminId,
                     ActionId = 4,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 5,
+                    RoleId = adminId,
+                    ActionId = 5,
+                    SubjectId = 1
+                },
+                //For editor
+                new RolePermission
+                {
+                    Id = 6,
+                    RoleId = editorId,
+                    ActionId = 1,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 7,
+                    RoleId = editorId,
+                    ActionId = 2,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 8,
+                    RoleId = editorId,
+                    ActionId = 3,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 9,
+                    RoleId = editorId,
+                    ActionId = 4,
+                    SubjectId = 1
+                },
+                new RolePermission
+                {
+                    Id = 10,
+                    RoleId = editorId,
+                    ActionId = 5,
                     SubjectId = 1
                 });
         }

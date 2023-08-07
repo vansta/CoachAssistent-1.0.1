@@ -31,28 +31,27 @@ namespace CoachAssistent.Api.Controllers
         [HttpGet("Overview")]
         public OverviewViewModel<ExerciseOverviewItemViewModel> GetExercises([FromQuery]BaseSearchViewModel request)
         {
-            var requestHeaders = Request.Headers;
             return exerciseManager.GetExercises(request);
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public Task<Guid> Create([FromForm]CreateExerciseViewModel exercise)
         {
             return exerciseManager.Create(exercise);
         }
-
+        [Authorize]
         [HttpPut]
         public Task<Guid> Update([FromForm] UpdateExerciseViewModel exercise)
         {
             return exerciseManager.Update(exercise);
         }
-
+        [Authorize]
         [HttpPost("Copy")]
         public Task<Guid> Copy([FromBody] Guid exerciseId)
         {
             return exerciseManager.Copy(exerciseId);
         }
-
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete(Guid id)
         {

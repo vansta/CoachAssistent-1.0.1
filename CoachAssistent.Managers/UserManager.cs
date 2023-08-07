@@ -2,6 +2,7 @@
 using CoachAssistent.Data;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
+using CoachAssistent.Models.Domain.Permissions;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Permission;
 using Microsoft.EntityFrameworkCore;
@@ -49,9 +50,33 @@ namespace CoachAssistent.Managers
                 {
                     Action = rp.Action!.Name,
                     Subject = rp.Subject!.Name,
+                    Reason = null,
                     Fields = rp.Fields.Select(f => f.PermissionField!.Name),
-                    GroupId = m.GroupId
+                    GroupIds = new List<Guid> { m.GroupId }
                 })).ToList();
+
+            IQueryable<RolePermission> editorPermissions = dbContext.Roles
+                .Include(r => r.RolePermissions)
+                    .ThenInclude(rp => rp.Action)
+                .Include(r => r.RolePermissions)
+                    .ThenInclude(rp => rp.Subject)
+                .Include(r => r.RolePermissions)
+                    .ThenInclude(rp => rp.Fields).ThenInclude(f => f.PermissionField)
+                .Where(r => r.Name.Equals("Editor"))
+                .SelectMany(r => r.RolePermissions);
+
+            groupPermissions.AddRange(editorPermissions.Select(rp => new RolePermissionViewModel
+            {
+                Action = rp.Action!.Name,
+                Subject = rp.Subject!.Name,
+                UserId = authenticationWrapper.UserId
+            }));
+
+            groupPermissions.Add(new RolePermissionViewModel
+            {
+                Action = "test",
+                Subject = "shareable"
+            });
 
             return groupPermissions;
         }

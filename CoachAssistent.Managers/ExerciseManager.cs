@@ -36,10 +36,10 @@ namespace CoachAssistent.Managers
                         .Where(e => e.Name.Contains(search.Search)
                             || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
                 }
-                if (search.TagIds is not null)
+                if (search.Tags is not null && search.Tags.Any())
                 {
                     exercises = exercises
-                        .Where(e => e.Tags.Select(t => t.Id).Any(t => search.TagIds.Contains(t)));
+                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
                 }
             }
 
@@ -64,13 +64,13 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                //SharingLevel = viewModel.SharingLevel,
                 Tags = CondenseTags(viewModel.Tags),
                 Shareable = new Shareable
                 {
                     SharingLevel = viewModel.SharingLevel,
                     Editors = CondenseEditors(viewModel.Editors),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) }
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) },
+                    ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
                 }
             };
 
@@ -92,23 +92,6 @@ namespace CoachAssistent.Managers
             return exercise.Id;
         }
 
-        //public async Task<Guid> UpdateOrCopy(UpdateExerciseViewModel viewModel)
-        //{
-        //    Exercise? exercise = await dbContext.Exercises
-        //        .Include(e => e.Attachments)
-        //        .Include(e => e.Shareable!.Editors)
-        //        .SingleAsync(e => e.Id.Equals(viewModel.Id));
-
-        //    if (exercise.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId))
-        //    {
-        //        return await Update(viewModel);
-        //    }
-        //    else
-        //    {
-        //        return await Copy(exercise, viewModel);
-        //    }
-        //}
-
         public async Task<Guid> Copy(Guid exerciseId)
         {
             Exercise? exercise = await dbContext.Exercises
@@ -120,18 +103,20 @@ namespace CoachAssistent.Managers
             {
                 Name = exercise.Name,
                 Description = exercise.Description,
-                //SharingLevel = viewModel.SharingLevel,
                 Tags = exercise.Tags,
                 Shareable = new Shareable
                 {
                     SharingLevel = SharingLevel.Public,
                     Editors = CondenseEditors(null),
                     HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) }
-                }
+                },
+                Attachments = exercise.Attachments.Select(a => new Attachment
+                {
+                    Name = a.Name,
+                    FilePath = a.FilePath
+                }).ToList()
             };
             copy = (await dbContext.Exercises.AddAsync(copy)).Entity;
-
-            //copy.Attachments = exercise.Attachments()
 
             foreach (var originalAttachment in exercise.Attachments)
             {
@@ -150,6 +135,7 @@ namespace CoachAssistent.Managers
                 .Include(e => e.Attachments)
                 .Include(e => e.Tags)
                 .Include(e => e.Shareable!.Editors)
+                .Include(e => e.Shareable!.ShareablesXGroups)
                 .SingleAsync(e => e.Id.Equals(viewModel.Id));
 
             exercise.Name = viewModel.Name;
@@ -159,6 +145,7 @@ namespace CoachAssistent.Managers
             exercise.Shareable!.SharingLevel = viewModel.SharingLevel;
 
             exercise.Shareable.Editors = CondenseEditors(viewModel.Editors, exercise.Shareable);
+            exercise.Shareable.ShareablesXGroups = CondenseGroups(viewModel.GroupIds, exercise.Shareable);
 
             await AddHistoryLog(exercise.ShareableId, EditActionType.Edit);
 

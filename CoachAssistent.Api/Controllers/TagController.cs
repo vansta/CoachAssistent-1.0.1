@@ -17,7 +17,7 @@ namespace CoachAssistent.Api.Controllers
             tagManager = new TagManager(context, mapper);
         }
         [HttpGet]
-        public IEnumerable<SelectViewModel> GetTags(string? search)
+        public IEnumerable<string> GetTags(string? search)
         {
             return tagManager.GetTags(search);
         }

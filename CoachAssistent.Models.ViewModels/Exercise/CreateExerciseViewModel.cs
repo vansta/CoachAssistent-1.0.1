@@ -16,6 +16,7 @@ namespace CoachAssistent.Models.ViewModels.Exercise
             AddedAttachments = new HashSet<IFormFile>();
             Tags = new HashSet<string>();
             Editors = new HashSet<Guid>();
+            GroupIds = new HashSet<Guid>();
         }
         public string Name { get; set; }
         public string? Description { get; set; }
@@ -25,5 +26,6 @@ namespace CoachAssistent.Models.ViewModels.Exercise
 
         public SharingLevel SharingLevel { get; set; }
         public ICollection<Guid> Editors { get; set; }
+        public ICollection<Guid> GroupIds { get; set; }
     }
 }

@@ -44,7 +44,6 @@ namespace CoachAssistent.Managers
             {
                 Guid userId = authenticationWrapper.UserId;
                 IEnumerable<Guid> groupIds = authenticationWrapper.User.GroupIds;
-                var test = collection.First();
                 collection = collection
                     .Where(c =>
                         c.Shareable != null &&
@@ -84,13 +83,13 @@ namespace CoachAssistent.Managers
             }).ToList() ?? new List<Tag>();
         }
 
-        internal ICollection<Editor> CondenseEditors(IEnumerable<Guid>? editors, Shareable? sharable = null)
+        internal ICollection<Editor> CondenseEditors(IEnumerable<Guid>? editors, Shareable? shareable = null)
         {
             if (editors is null || !editors.Any())
             {
-                if (sharable is not null && sharable.Editors.Count > 0)
+                if (shareable is not null && shareable.Editors.Count > 0)
                 {
-                    return sharable.Editors;
+                    return shareable.Editors;
                 }
                 else
                 {
@@ -101,8 +100,22 @@ namespace CoachAssistent.Managers
 
             return editors.Select(x =>
             {
-                Editor? editor = sharable?.Editors.FirstOrDefault(e => e.UserId.Equals(x));
+                Editor? editor = shareable?.Editors.FirstOrDefault(e => e.UserId.Equals(x));
                 return editor ?? new Editor { UserId = x };
+            }).ToList();
+        }
+
+        internal ICollection<ShareablesXGroups> CondenseGroups(IEnumerable<Guid>? groupIds, Shareable? shareable = null)
+        {
+            if (groupIds is null || !groupIds.Any())
+            {
+                return shareable?.ShareablesXGroups ?? new List<ShareablesXGroups>();
+            };
+
+            return groupIds.Select(x =>
+            {
+                ShareablesXGroups? shareableXGroup = shareable?.ShareablesXGroups.FirstOrDefault(e => e.GroupId.Equals(x));
+                return shareableXGroup ?? new ShareablesXGroups { GroupId = x };
             }).ToList();
         }
     }

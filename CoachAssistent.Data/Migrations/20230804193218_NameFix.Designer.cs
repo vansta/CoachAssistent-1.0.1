@@ -4,6 +4,7 @@ using CoachAssistent.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    partial class CoachAssistentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230804193218_NameFix")]
+    partial class NameFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,11 +218,6 @@ namespace CoachAssistent.Data.Migrations
                         {
                             Id = 4,
                             Name = "delete"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "editShareability"
                         });
                 });
 
@@ -339,48 +337,6 @@ namespace CoachAssistent.Data.Migrations
                             ActionId = 4,
                             RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
                             SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ActionId = 5,
-                            RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ActionId = 1,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ActionId = 2,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ActionId = 3,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 9,
-                            ActionId = 4,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 10,
-                            ActionId = 5,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
                         });
                 });
 
@@ -444,12 +400,6 @@ namespace CoachAssistent.Data.Migrations
                             Id = new Guid("ae0afd1f-4667-41a9-bef5-0ee9328be9ca"),
                             Description = "A reader can read",
                             Name = "Reader"
-                        },
-                        new
-                        {
-                            Id = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            Description = "An editor owns an exercise, segment or training",
-                            Name = "Editor"
                         });
                 });
 
@@ -808,7 +758,7 @@ namespace CoachAssistent.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoachAssistent.Models.Domain.Role", "Role")
+                    b.HasOne("CoachAssistent.Models.Domain.Role", null)
                         .WithMany("RolePermissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -821,8 +771,6 @@ namespace CoachAssistent.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Action");
-
-                    b.Navigation("Role");
 
                     b.Navigation("Subject");
                 });

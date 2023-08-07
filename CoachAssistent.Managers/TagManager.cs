@@ -17,7 +17,7 @@ namespace CoachAssistent.Managers
 
         }
 
-        public IEnumerable<SelectViewModel> GetTags(string? search)
+        public IEnumerable<string> GetTags(string? search)
         {
             IQueryable<Tag> tags = dbContext.Tags;
             if (!string.IsNullOrEmpty(search))
@@ -25,7 +25,7 @@ namespace CoachAssistent.Managers
                 tags = tags.Where(t => t.Name.Contains(search));
             }
             return tags
-                .Select(t => new SelectViewModel(t.Id.ToString(), t.Name));   
+                .Select(t => t.Name);   
         }
     }
 }
