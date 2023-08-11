@@ -60,10 +60,11 @@ namespace CoachAssistent.Managers.Helpers
                 new Claim(CustomClaimTypes.Name, user.UserName ?? ""),
                 new Claim(ClaimTypes.Email, user.Email ?? ""),
                 new Claim(CustomClaimTypes.Email, user.Email ?? ""),
-                new Claim(CustomClaimTypes.License, user.LicenseLevel ?? ""),
+                new Claim(CustomClaimTypes.License, user.LicenseId.ToString() ?? ""),
+                new Claim(CustomClaimTypes.LicenseLevel, user.LicenseLevel ?? ""),
             };
 
-            claims.AddRange(user.GroupIds.Select(gi => new Claim(CustomClaimTypes.Group, gi.ToString())));
+            claims.AddRange(user.GroupIds.Select(gi => new Claim(CustomClaimTypes.Groups, gi.ToString())));
 
             JwtSecurityToken jwt = new(
                 issuer: issuer,

@@ -20,7 +20,7 @@ namespace CoachAssistent.Managers
         //readonly IConfiguration configuration;
 
         public GroupManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, authenticationWrapper)
+            : base(context, mapper, configuration, authenticationWrapper)
         {
             //this.configuration = configuration;
         }

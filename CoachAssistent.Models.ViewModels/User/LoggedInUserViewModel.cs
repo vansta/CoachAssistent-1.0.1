@@ -15,6 +15,7 @@ namespace CoachAssistent.Models.ViewModels.User
         public Guid? Id { get; set; }
         public string? UserName { get; set; }
         public string? Email { get; set; }
+        public Guid? LicenseId { get; set; }
         public string? LicenseLevel { get; set; }
 
         public IEnumerable<Guid> GroupIds { get; set; }

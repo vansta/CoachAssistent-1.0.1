@@ -3,6 +3,10 @@ using CoachAssistent.Common.Enums;
 using CoachAssistent.Data;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
+using CoachAssistent.Models.Domain.Permissions;
+using CoachAssistent.Models.ViewModels.Permission;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,23 +18,36 @@ namespace CoachAssistent.Managers
     public abstract class BaseAuthenticatedManager : BaseManager
     {
         internal readonly IAuthenticationWrapper authenticationWrapper;
-        public BaseAuthenticatedManager(CoachAssistentDbContext context, IMapper _mapper, IAuthenticationWrapper authenticationWrapper) : base(context, _mapper)
+        readonly IConfiguration _configuration;
+        public BaseAuthenticatedManager(CoachAssistentDbContext context, IMapper _mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : base(context, _mapper)
         {
             this.authenticationWrapper = authenticationWrapper;
+            this._configuration = configuration;
         }
 
-        //public bool Can<T>(Guid entityId, string subject, string action, string field) where T : ISharable
-        //{
-        //    switch (subject)
-        //    {
-        //        case "group":
-        //            return dbContext.Members
-        //                .Where(m => m.GroupId.Equals(entityId) && m.UserId == authenticationWrapper.UserId)
-        //                .Any(m => m.Role.RolePermissions)
-        //        default:
-        //            break;
-        //    }
-        //}
+        public bool Can(IShareable shareable, string action, string field)
+        {
+            IEnumerable<RolePermissionViewModel> rolePermissions = GetPermissions();
+            return rolePermissions.Any(rp =>
+                rp.Subject!.Equals("shareable")
+                && rp.Action!.Equals(action)
+                && rp.Fields.Contains(field)
+                && (
+                    shareable.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId)
+                    || shareable.Shareable.ShareablesXGroups.Select(sg => sg.GroupId).Contains(rp.Ids!.First())
+                )
+                );
+        }
+
+        public bool Can(Group group, string action, string field)
+        {
+            IEnumerable<RolePermissionViewModel> rolePermissions = GetPermissions();
+            return rolePermissions.Any(rp =>
+                                            rp.Subject!.Equals("group")
+                                            && rp.Action!.Equals(action)
+                                            && rp.Fields.Contains(field)
+                                            && rp.Ids!.Contains(group.Id));
+        }
 
         public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : IShareable
         {
@@ -117,6 +134,50 @@ namespace CoachAssistent.Managers
                 ShareablesXGroups? shareableXGroup = shareable?.ShareablesXGroups.FirstOrDefault(e => e.GroupId.Equals(x));
                 return shareableXGroup ?? new ShareablesXGroups { GroupId = x };
             }).ToList();
+        }
+
+        public IEnumerable<RolePermissionViewModel> GetPermissions()
+        {
+            //IEnumerable<SubjectCondition> subjectConditions = new List<SubjectCondition>();
+            //_configuration.GetSection("SubjectConditions")
+            //    .Bind(subjectConditions);
+            //Dictionary<string, string> conditions = subjectConditions
+            //    .Select(sc => new KeyValuePair<string, string>(sc.Subject, sc.Condition))
+
+            var groupPermissions = dbContext.Members
+                .Include(m => m.Role!.RolePermissions)
+                    .ThenInclude(rp => rp.Action)
+                .Include(m => m.Role!.RolePermissions)
+                    .ThenInclude(rp => rp.Subject)
+                .Include(m => m.Role!.RolePermissions)
+                    .ThenInclude(rp => rp.Fields).ThenInclude(f => f.PermissionField)
+                .Where(m => m.UserId.Equals(authenticationWrapper.UserId))
+                .SelectMany(m => m.Role!.RolePermissions.Select(rp => new RolePermissionViewModel
+                {
+                    Action = rp.Action!.Name,
+                    Subject = rp.Subject!.Name,
+                    Reason = rp.Reason,
+                    Fields = rp.Fields.Select(f => f.PermissionField!.Name),
+                    Ids = new List<Guid> { m.GroupId },
+                    Condition = rp.Subject!.Name == "group" ? "id" : "groupIds"
+                })).ToList();
+
+            var licensePermissions = dbContext.LicensePermissions
+                .Where(lp => lp.LicenseId.Equals(authenticationWrapper.LicenseId))
+                .Select(lp => new RolePermissionViewModel
+                {
+                    Action = lp.Action!.Name,
+                    Subject = lp.Subject!.Name,
+                    Reason = lp.Reason,
+                    Fields = lp.Fields.Select(f => f.PermissionField!.Name),
+                    Ids = new List<Guid> { authenticationWrapper.UserId },
+                    UserId = authenticationWrapper.UserId,
+                    Condition = lp.Subject!.Name == "group" ? "none" : "editors"
+                }).ToList();
+
+            groupPermissions.AddRange(licensePermissions);
+
+            return groupPermissions;
         }
     }
 }

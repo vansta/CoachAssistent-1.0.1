@@ -6,6 +6,7 @@ using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Training;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,8 @@ namespace CoachAssistent.Managers
 {
     public class TrainingManager : BaseAuthenticatedManager
     {
-        public TrainingManager(CoachAssistentDbContext context, IMapper mapper, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, authenticationWrapper)
+        public TrainingManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
+            : base(context, mapper, configuration, authenticationWrapper)
         {
 
         }

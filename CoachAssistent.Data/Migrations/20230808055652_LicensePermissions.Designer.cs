@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    [Migration("20230803164027_Sharebles")]
-    partial class Sharebles
+    [Migration("20230808055652_LicensePermissions")]
+    partial class LicensePermissions
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -57,16 +57,7 @@ namespace CoachAssistent.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ExerciseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("SegmentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("SharebleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("TrainingId")
+                    b.Property<Guid>("ShareableId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
@@ -74,13 +65,7 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExerciseId");
-
-                    b.HasIndex("SegmentId");
-
-                    b.HasIndex("SharebleId");
-
-                    b.HasIndex("TrainingId");
+                    b.HasIndex("ShareableId");
 
                     b.HasIndex("UserId");
 
@@ -104,12 +89,12 @@ namespace CoachAssistent.Data.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<Guid>("SharebleId")
+                    b.Property<Guid>("ShareableId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SharebleId");
+                    b.HasIndex("ShareableId");
 
                     b.ToTable("Exercises");
                 });
@@ -143,13 +128,10 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<int>("EditActionType")
                         .HasColumnType("int");
 
-                    b.Property<int>("HistoryId")
-                        .HasColumnType("int");
-
                     b.Property<Guid?>("OriginId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("SharebleId")
+                    b.Property<Guid>("ShareableId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("Timestamp")
@@ -160,9 +142,52 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SharebleId");
+                    b.HasIndex("OriginId");
+
+                    b.HasIndex("ShareableId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("HistoryLogs");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.License", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Licenses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c7b16ea3-26db-4ad0-a66d-697e453d8b0c"),
+                            Description = "Hands off!",
+                            Level = 99,
+                            Name = "Administrator"
+                        },
+                        new
+                        {
+                            Id = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            Description = "Default license",
+                            Level = 1,
+                            Name = "Free user"
+                        });
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Member", b =>
@@ -189,6 +214,91 @@ namespace CoachAssistent.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActionId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("LicenseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionId");
+
+                    b.HasIndex("LicenseId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("LicensePermissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ActionId = 2,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ActionId = 3,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ActionId = 4,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 10,
+                            ActionId = 1,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 2
+                        });
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermissionXPermissionField", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LicensePermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionFieldId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LicensePermissionId");
+
+                    b.HasIndex("PermissionFieldId");
+
+                    b.ToTable("LicensePermissionXPermissionFields");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionAction", b =>
@@ -260,6 +370,71 @@ namespace CoachAssistent.Data.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("PermissionFields");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Name",
+                            Name = "name",
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "description",
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "attachments",
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "shareability",
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Description = "Name",
+                            Name = "name",
+                            SubjectId = 2
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Name = "description",
+                            SubjectId = 2
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Name = "member",
+                            SubjectId = 2
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Description = "Name",
+                            Name = "name",
+                            SubjectId = 3
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Name = "description",
+                            SubjectId = 3
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Name = "permissions",
+                            SubjectId = 3
+                        });
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionSubject", b =>
@@ -287,22 +462,17 @@ namespace CoachAssistent.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "exercise"
+                            Name = "shareable"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "segment"
+                            Name = "group"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "training"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "group"
+                            Name = "role"
                         });
                 });
 
@@ -317,10 +487,14 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<int>("ActionId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Reason")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("SubjectId")
+                    b.Property<int?>("SubjectId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -338,7 +512,28 @@ namespace CoachAssistent.Data.Migrations
                         {
                             Id = 1,
                             ActionId = 1,
-                            RoleId = new Guid("bc435042-5a53-4a75-97be-32a102ec23e8"),
+                            RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ActionId = 2,
+                            RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ActionId = 3,
+                            RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ActionId = 4,
+                            RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
                             SubjectId = 1
                         });
                 });
@@ -364,6 +559,32 @@ namespace CoachAssistent.Data.Migrations
                     b.HasIndex("RolePermissionId");
 
                     b.ToTable("RolePermissionsXPermissionFields");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PermissionFieldId = 1,
+                            RolePermissionId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PermissionFieldId = 2,
+                            RolePermissionId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            PermissionFieldId = 3,
+                            RolePermissionId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            PermissionFieldId = 4,
+                            RolePermissionId = 1
+                        });
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Role", b =>
@@ -375,6 +596,12 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
+
+                    b.Property<int>("Index")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MinimalLicenseLevel")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -388,20 +615,26 @@ namespace CoachAssistent.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("bc435042-5a53-4a75-97be-32a102ec23e8"),
+                            Id = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
                             Description = "An administrator can edit everything",
+                            Index = 0,
+                            MinimalLicenseLevel = 1,
                             Name = "Administrator"
                         },
                         new
                         {
-                            Id = new Guid("ee443c8f-8971-45cb-b8f5-4761ab3853ea"),
+                            Id = new Guid("4948b3ba-6061-4995-ac82-2da4885839e5"),
                             Description = "A writer can edit and create",
+                            Index = 2,
+                            MinimalLicenseLevel = 1,
                             Name = "Writer"
                         },
                         new
                         {
-                            Id = new Guid("496360b4-75be-4f56-8fd6-24ad1121f4fa"),
+                            Id = new Guid("ae0afd1f-4667-41a9-bef5-0ee9328be9ca"),
                             Description = "A reader can read",
+                            Index = 3,
+                            MinimalLicenseLevel = 1,
                             Name = "Reader"
                         });
                 });
@@ -423,12 +656,12 @@ namespace CoachAssistent.Data.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<Guid>("SharebleId")
+                    b.Property<Guid>("ShareableId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SharebleId");
+                    b.HasIndex("ShareableId");
 
                     b.ToTable("Segments");
                 });
@@ -451,28 +684,7 @@ namespace CoachAssistent.Data.Migrations
                     b.ToTable("SegmentsXExercises");
                 });
 
-            modelBuilder.Entity("CoachAssistent.Models.Domain.SharablesXGroups", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("SharebleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("SharebleId");
-
-                    b.ToTable("SharablesXGroups");
-                });
-
-            modelBuilder.Entity("CoachAssistent.Models.Domain.Shareble", b =>
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Shareable", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -483,7 +695,28 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sharebles");
+                    b.ToTable("Shareables");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.ShareablesXGroups", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ShareableId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ShareableId");
+
+                    b.ToTable("ShareablesXGroups");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Tag", b =>
@@ -521,12 +754,12 @@ namespace CoachAssistent.Data.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("nvarchar(64)");
 
-                    b.Property<Guid>("SharebleId")
+                    b.Property<Guid>("ShareableId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SharebleId");
+                    b.HasIndex("ShareableId");
 
                     b.ToTable("Trainings");
                 });
@@ -577,6 +810,9 @@ namespace CoachAssistent.Data.Migrations
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("LicenseId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<byte[]>("Salt")
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
@@ -587,6 +823,8 @@ namespace CoachAssistent.Data.Migrations
                         .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LicenseId");
 
                     b.ToTable("Users");
                 });
@@ -662,21 +900,11 @@ namespace CoachAssistent.Data.Migrations
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Editor", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Exercise", "Exercise")
-                        .WithMany()
-                        .HasForeignKey("ExerciseId");
-
-                    b.HasOne("CoachAssistent.Models.Domain.Segment", "Segment")
-                        .WithMany()
-                        .HasForeignKey("SegmentId");
-
-                    b.HasOne("CoachAssistent.Models.Domain.Shareble", null)
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Shareable")
                         .WithMany("Editors")
-                        .HasForeignKey("SharebleId");
-
-                    b.HasOne("CoachAssistent.Models.Domain.Training", "Training")
-                        .WithMany()
-                        .HasForeignKey("TrainingId");
+                        .HasForeignKey("ShareableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CoachAssistent.Models.Domain.User", "User")
                         .WithMany()
@@ -684,31 +912,45 @@ namespace CoachAssistent.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Exercise");
-
-                    b.Navigation("Segment");
-
-                    b.Navigation("Training");
+                    b.Navigation("Shareable");
 
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Exercise", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Shareble", "Shareble")
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Shareable")
                         .WithMany()
-                        .HasForeignKey("SharebleId")
+                        .HasForeignKey("ShareableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Shareble");
+                    b.Navigation("Shareable");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.HistoryLog", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Shareble", null)
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Origin")
+                        .WithMany("Copies")
+                        .HasForeignKey("OriginId");
+
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Shareable")
                         .WithMany("HistoryLogs")
-                        .HasForeignKey("SharebleId");
+                        .HasForeignKey("ShareableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Origin");
+
+                    b.Navigation("Shareable");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Member", b =>
@@ -738,10 +980,54 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionAction", "Action")
+                        .WithMany()
+                        .HasForeignKey("ActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.License", "License")
+                        .WithMany("LicensePermissions")
+                        .HasForeignKey("LicenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionSubject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId");
+
+                    b.Navigation("Action");
+
+                    b.Navigation("License");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermissionXPermissionField", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.LicensePermission", "LicensePermission")
+                        .WithMany("Fields")
+                        .HasForeignKey("LicensePermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionField", "PermissionField")
+                        .WithMany()
+                        .HasForeignKey("PermissionFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LicensePermission");
+
+                    b.Navigation("PermissionField");
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionField", b =>
                 {
                     b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionSubject", "Subject")
-                        .WithMany()
+                        .WithMany("Fields")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -757,7 +1043,7 @@ namespace CoachAssistent.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoachAssistent.Models.Domain.Role", null)
+                    b.HasOne("CoachAssistent.Models.Domain.Role", "Role")
                         .WithMany("RolePermissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -765,11 +1051,11 @@ namespace CoachAssistent.Data.Migrations
 
                     b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionSubject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SubjectId");
 
                     b.Navigation("Action");
+
+                    b.Navigation("Role");
 
                     b.Navigation("Subject");
                 });
@@ -795,13 +1081,13 @@ namespace CoachAssistent.Data.Migrations
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Segment", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Shareble", "Shareble")
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Shareable")
                         .WithMany()
-                        .HasForeignKey("SharebleId")
+                        .HasForeignKey("ShareableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Shareble");
+                    b.Navigation("Shareable");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.SegmentXExercise", b =>
@@ -823,34 +1109,34 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("Segment");
                 });
 
-            modelBuilder.Entity("CoachAssistent.Models.Domain.SharablesXGroups", b =>
+            modelBuilder.Entity("CoachAssistent.Models.Domain.ShareablesXGroups", b =>
                 {
                     b.HasOne("CoachAssistent.Models.Domain.Group", "Group")
-                        .WithMany("SharablesXGroups")
+                        .WithMany("ShareablesXGroups")
                         .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoachAssistent.Models.Domain.Shareble", "Shareble")
-                        .WithMany("SharablesXGroups")
-                        .HasForeignKey("SharebleId")
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Shareable")
+                        .WithMany("ShareablesXGroups")
+                        .HasForeignKey("ShareableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Group");
 
-                    b.Navigation("Shareble");
+                    b.Navigation("Shareable");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Training", b =>
                 {
-                    b.HasOne("CoachAssistent.Models.Domain.Shareble", "Shareble")
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Shareable")
                         .WithMany()
-                        .HasForeignKey("SharebleId")
+                        .HasForeignKey("ShareableId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Shareble");
+                    b.Navigation("Shareable");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.TrainingXSegment", b =>
@@ -870,6 +1156,17 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("Segment");
 
                     b.Navigation("Training");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.User", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.License", "License")
+                        .WithMany()
+                        .HasForeignKey("LicenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("License");
                 });
 
             modelBuilder.Entity("ExerciseTag", b =>
@@ -943,12 +1240,27 @@ namespace CoachAssistent.Data.Migrations
                 {
                     b.Navigation("Members");
 
-                    b.Navigation("SharablesXGroups");
+                    b.Navigation("ShareablesXGroups");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.License", b =>
+                {
+                    b.Navigation("LicensePermissions");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
+                {
+                    b.Navigation("Fields");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionField", b =>
                 {
                     b.Navigation("RolePermissions");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionSubject", b =>
+                {
+                    b.Navigation("Fields");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.RolePermission", b =>
@@ -968,13 +1280,15 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("TrainingsXSegments");
                 });
 
-            modelBuilder.Entity("CoachAssistent.Models.Domain.Shareble", b =>
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Shareable", b =>
                 {
+                    b.Navigation("Copies");
+
                     b.Navigation("Editors");
 
                     b.Navigation("HistoryLogs");
 
-                    b.Navigation("SharablesXGroups");
+                    b.Navigation("ShareablesXGroups");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Training", b =>

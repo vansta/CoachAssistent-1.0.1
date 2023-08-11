@@ -213,6 +213,91 @@ namespace CoachAssistent.Data.Migrations
                     b.ToTable("Members");
                 });
 
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActionId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("LicenseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActionId");
+
+                    b.HasIndex("LicenseId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("LicensePermissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ActionId = 2,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ActionId = 3,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ActionId = 4,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 10,
+                            ActionId = 1,
+                            LicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c"),
+                            SubjectId = 2
+                        });
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermissionXPermissionField", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LicensePermissionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PermissionFieldId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LicensePermissionId");
+
+                    b.HasIndex("PermissionFieldId");
+
+                    b.ToTable("LicensePermissionXPermissionFields");
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionAction", b =>
                 {
                     b.Property<int>("Id")
@@ -254,11 +339,6 @@ namespace CoachAssistent.Data.Migrations
                         {
                             Id = 4,
                             Name = "delete"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "editShareability"
                         });
                 });
 
@@ -293,27 +373,64 @@ namespace CoachAssistent.Data.Migrations
                         {
                             Id = 1,
                             Description = "Name",
-                            Name = "Name",
+                            Name = "name",
                             SubjectId = 1
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Description",
+                            Name = "description",
                             SubjectId = 1
                         },
                         new
                         {
                             Id = 3,
-                            Description = "Name",
-                            Name = "Name",
-                            SubjectId = 2
+                            Name = "attachments",
+                            SubjectId = 1
                         },
                         new
                         {
                             Id = 4,
-                            Name = "Description",
+                            Name = "shareability",
+                            SubjectId = 1
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Description = "Name",
+                            Name = "name",
                             SubjectId = 2
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Name = "description",
+                            SubjectId = 2
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Name = "member",
+                            SubjectId = 2
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Description = "Name",
+                            Name = "name",
+                            SubjectId = 3
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Name = "description",
+                            SubjectId = 3
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Name = "permissions",
+                            SubjectId = 3
                         });
                 });
 
@@ -348,6 +465,11 @@ namespace CoachAssistent.Data.Migrations
                         {
                             Id = 2,
                             Name = "group"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "role"
                         });
                 });
 
@@ -410,48 +532,6 @@ namespace CoachAssistent.Data.Migrations
                             ActionId = 4,
                             RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
                             SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ActionId = 5,
-                            RoleId = new Guid("5e8876ee-a3f0-4714-9566-22411faa32d4"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ActionId = 1,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ActionId = 2,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ActionId = 3,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 9,
-                            ActionId = 4,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
-                        },
-                        new
-                        {
-                            Id = 10,
-                            ActionId = 5,
-                            RoleId = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            SubjectId = 1
                         });
                 });
 
@@ -476,6 +556,32 @@ namespace CoachAssistent.Data.Migrations
                     b.HasIndex("RolePermissionId");
 
                     b.ToTable("RolePermissionsXPermissionFields");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            PermissionFieldId = 1,
+                            RolePermissionId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            PermissionFieldId = 2,
+                            RolePermissionId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            PermissionFieldId = 3,
+                            RolePermissionId = 1
+                        },
+                        new
+                        {
+                            Id = 4,
+                            PermissionFieldId = 4,
+                            RolePermissionId = 1
+                        });
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Role", b =>
@@ -527,14 +633,6 @@ namespace CoachAssistent.Data.Migrations
                             Index = 3,
                             MinimalLicenseLevel = 1,
                             Name = "Reader"
-                        },
-                        new
-                        {
-                            Id = new Guid("be0afd1f-4667-41a9-bef5-0ee9328be9ca"),
-                            Description = "An editor owns an exercise, segment or training",
-                            Index = 99,
-                            MinimalLicenseLevel = 99,
-                            Name = "Editor"
                         });
                 });
 
@@ -879,6 +977,50 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionAction", "Action")
+                        .WithMany()
+                        .HasForeignKey("ActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.License", "License")
+                        .WithMany("LicensePermissions")
+                        .HasForeignKey("LicenseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionSubject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId");
+
+                    b.Navigation("Action");
+
+                    b.Navigation("License");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermissionXPermissionField", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.LicensePermission", "LicensePermission")
+                        .WithMany("Fields")
+                        .HasForeignKey("LicensePermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionField", "PermissionField")
+                        .WithMany()
+                        .HasForeignKey("PermissionFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LicensePermission");
+
+                    b.Navigation("PermissionField");
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionField", b =>
                 {
                     b.HasOne("CoachAssistent.Models.Domain.Permissions.PermissionSubject", "Subject")
@@ -1096,6 +1238,16 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("Members");
 
                     b.Navigation("ShareablesXGroups");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.License", b =>
+                {
+                    b.Navigation("LicensePermissions");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
+                {
+                    b.Navigation("Fields");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionField", b =>

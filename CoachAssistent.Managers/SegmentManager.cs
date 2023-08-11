@@ -6,13 +6,14 @@ using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Segment;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace CoachAssistent.Managers
 {
     public class SegmentManager : BaseAuthenticatedManager
     {
-        public SegmentManager(CoachAssistentDbContext context, IMapper mapper, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, authenticationWrapper)
+        public SegmentManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
+            : base(context, mapper, configuration, authenticationWrapper)
         {
 
         }

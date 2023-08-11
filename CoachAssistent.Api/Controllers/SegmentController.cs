@@ -14,10 +14,10 @@ namespace CoachAssistent.Api.Controllers
     public class SegmentController : ControllerBase
     {
         readonly SegmentManager segmentManager;
-        public SegmentController(CoachAssistentDbContext context, IMapper mapper, IHttpContextAccessor contextAccessor)
+        public SegmentController(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IHttpContextAccessor contextAccessor)
         {
             IAuthenticationWrapper authenticationWrapper = new AuthenticationWrapper(contextAccessor);
-            segmentManager = new SegmentManager(context, mapper, authenticationWrapper);
+            segmentManager = new SegmentManager(context, mapper, configuration, authenticationWrapper);
         }
         [HttpGet]
         public Task<SegmentViewModel> GetSegment(Guid id)

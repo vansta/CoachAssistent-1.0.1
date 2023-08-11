@@ -21,7 +21,7 @@ namespace CoachAssistent.Managers
         readonly IConfiguration configuration;
 
         public RoleManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, authenticationWrapper)
+            : base(context, mapper, configuration, authenticationWrapper)
         {
             this.configuration = configuration;
         }
@@ -40,7 +40,8 @@ namespace CoachAssistent.Managers
                     .ThenInclude(rp => rp.Subject)
                 .Include(r => r.RolePermissions)
                     .ThenInclude(rp => rp.Fields).ThenInclude(f => f.PermissionField)
-                .Where(r => r.MinimalLicenseLevel <= authenticationWrapper.LicenseLevel);
+                .Where(r => r.MinimalLicenseLevel <= authenticationWrapper.LicenseLevel)
+                .OrderBy(r => r.Index);
 
             return new OverviewViewModel<RoleOverviewItemViewModel>
             {

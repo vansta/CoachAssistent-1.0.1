@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoachAssistent.Models.Domain.Permissions;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,5 +16,7 @@ namespace CoachAssistent.Models.Domain
         [MaxLength(1024)]
         public string? Description { get; set; }
         public int Level { get; set; }
+
+        public ICollection<LicensePermission> LicensePermissions { get; set; } = new HashSet<LicensePermission>();
     }
 }

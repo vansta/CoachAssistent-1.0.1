@@ -1,0 +1,7 @@
+﻿insert into LicensePermissions
+select 'C7B16EA3-26DB-4AD0-A66D-697E453D8B0C', 1, ps.Id, ''
+from PermissionSubjects ps
+
+insert into LicensePermissionXPermissionFields
+select lp.Id, pf.Id from LicensePermissions lp
+join PermissionFields pf on pf.Id = lp.SubjectId

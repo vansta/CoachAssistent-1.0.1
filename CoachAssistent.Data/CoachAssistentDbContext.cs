@@ -33,6 +33,9 @@ namespace CoachAssistent.Data
         public DbSet<PermissionField> PermissionFields => Set<PermissionField>();
         public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
         public DbSet<RolePermissionXPermissionField> RolePermissionsXPermissionFields => Set<RolePermissionXPermissionField>();
+        public DbSet<LicensePermission> LicensePermissions => Set<LicensePermission>();
+        public DbSet<LicensePermissionXPermissionField> LicensePermissionXPermissionFields => Set<LicensePermissionXPermissionField>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -88,8 +91,8 @@ namespace CoachAssistent.Data
                 .HasOne(hl => hl.Origin)
                 .WithMany(s => s.Copies);
 
-            Guid adminLicenseId = new Guid("c7b16ea3-26db-4ad0-a66d-697e453d8b0c");
-            Guid freeLicenseId = new Guid("ad48ebbb-ae91-457f-b108-6b86d45ad02c");
+            Guid adminLicenseId = new("c7b16ea3-26db-4ad0-a66d-697e453d8b0c");
+            Guid defaultLicenseId = new("ad48ebbb-ae91-457f-b108-6b86d45ad02c");
 
             modelBuilder.Entity<License>()
                 .HasData(new License
@@ -101,16 +104,17 @@ namespace CoachAssistent.Data
                 },
                 new License
                 {
-                    Id = freeLicenseId,
+                    Id = defaultLicenseId,
                     Name = "Free user",
                     Description = "Default license",
                     Level = 1
                 });
 
-            Guid adminId = new Guid("5E8876EE-A3F0-4714-9566-22411FAA32D4");
-            Guid writerId = new Guid("4948B3BA-6061-4995-AC82-2DA4885839E5");
-            Guid readerId = new Guid("AE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
-            Guid editorId = new Guid("BE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
+            Guid adminId = new("5E8876EE-A3F0-4714-9566-22411FAA32D4");
+            Guid writerId = new("4948B3BA-6061-4995-AC82-2DA4885839E5");
+            Guid readerId = new("AE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
+            //Guid editorId = new Guid("BE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
+            //Guid defaultId = new Guid("CE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
             modelBuilder.Entity<Role>()
                 .HasData(new Role
                 {
@@ -135,15 +139,24 @@ namespace CoachAssistent.Data
                     Description = "A reader can read",
                     Index = 3,
                     MinimalLicenseLevel = 1
-                },
-                new Role
-                {
-                    Id = editorId,
-                    Name = "Editor",
-                    Description = "An editor owns an exercise, segment or training",
-                    Index = 99,
-                    MinimalLicenseLevel = 99
-                });
+                }
+                //new Role
+                //{
+                //    Id = editorId,
+                //    Name = "Editor",
+                //    Description = "An editor owns an exercise, segment or training",
+                //    Index = 99,
+                //    MinimalLicenseLevel = 99
+                //},
+                //new Role
+                //{
+                //    Id = defaultId,
+                //    Name = "Default user",
+                //    Description = "A default role, allowing basic functionality",
+                //    Index = 10,
+                //    MinimalLicenseLevel = 99
+                //}
+                );
             modelBuilder.Entity<PermissionAction>()
                 .HasData(new PermissionAction
                 {
@@ -163,11 +176,6 @@ namespace CoachAssistent.Data
                 {
                     Id = 4,
                     Name = "delete"
-                },
-                new PermissionAction
-                {
-                    Id = 5,
-                    Name = "editShareability"
                 });
             modelBuilder.Entity<PermissionSubject>()
                 .HasData(new PermissionSubject
@@ -179,38 +187,90 @@ namespace CoachAssistent.Data
                 {
                     Id = 2,
                     Name = "group"
+                },
+                new PermissionSubject
+                {
+                    Id = 3,
+                    Name = "role"
                 });
+
+            List<PermissionField> permissionFields = new List<PermissionField>
+            {
+                //shareable
+                new PermissionField
+                {
+                    Id = 1,
+                    Name = "name",
+                    Description = "Name",
+                    SubjectId = 1
+                },
+                new PermissionField
+                {
+                    Id = 2,
+                    Name = "description",
+                    SubjectId = 1
+                },
+                new PermissionField
+                {
+                    Id = 3,
+                    Name = "attachments",
+                    SubjectId = 1
+                },
+                new PermissionField
+                {
+                    Id = 4,
+                    Name = "shareability",
+                    SubjectId = 1
+                },
+                //group
+                new PermissionField
+                {
+                    Id = 30,
+                    Name = "name",
+                    Description = "Name",
+                    SubjectId = 2
+                },
+                new PermissionField
+                {
+                    Id = 31,
+                    Name = "description",
+                    SubjectId = 2
+                },
+                new PermissionField
+                {
+                    Id = 32,
+                    Name = "member",
+                    SubjectId = 2
+                },
+                //role
+                new PermissionField
+                {
+                    Id = 50,
+                    Name = "name",
+                    Description = "Name",
+                    SubjectId = 3
+                },
+                new PermissionField
+                {
+                    Id = 51,
+                    Name = "description",
+                    SubjectId = 3
+                },
+                new PermissionField
+                {
+                    Id = 52,
+                    Name = "permissions",
+                    SubjectId = 3
+                }
+            };
 
             modelBuilder.Entity<PermissionField>()
-                .HasData(new PermissionField
-                {
-                    Id = 1,
-                    Name = "Name",
-                    Description = "Name",
-                    SubjectId = 1
-                },
-                new PermissionField
-                {
-                    Id = 2,
-                    Name = "Description",
-                    SubjectId = 1
-                },
-                new PermissionField
-                {
-                    Id = 3,
-                    Name = "Name",
-                    Description = "Name",
-                    SubjectId = 2
-                },
-                new PermissionField
-                {
-                    Id = 4,
-                    Name = "Description",
-                    SubjectId = 2
-                });
+                .HasData(permissionFields);
 
             modelBuilder.Entity<RolePermission>()
-                .HasData(new RolePermission
+                .HasData(
+                //admin
+                new RolePermission
                 {
                     Id = 1,
                     RoleId = adminId,
@@ -237,49 +297,120 @@ namespace CoachAssistent.Data
                     RoleId = adminId,
                     ActionId = 4,
                     SubjectId = 1
-                },
-                new RolePermission
+                });
+
+            modelBuilder.Entity<RolePermissionXPermissionField>()
+                .HasData(new RolePermissionXPermissionField
                 {
-                    Id = 5,
-                    RoleId = adminId,
-                    ActionId = 5,
-                    SubjectId = 1
+                    Id = 1,
+                    PermissionFieldId = 1,
+                    RolePermissionId = 1
                 },
+                new RolePermissionXPermissionField
+                {
+                    Id = 2,
+                    PermissionFieldId = 2,
+                    RolePermissionId = 1
+                },
+                new RolePermissionXPermissionField
+                {
+                    Id = 3,
+                    PermissionFieldId = 3,
+                    RolePermissionId = 1
+                },
+                new RolePermissionXPermissionField
+                {
+                    Id = 4,
+                    PermissionFieldId = 4,
+                    RolePermissionId = 1
+                });
+
+            modelBuilder.Entity<LicensePermission>()
+                .HasData(
                 //For editor
-                new RolePermission
+                new LicensePermission
                 {
-                    Id = 6,
-                    RoleId = editorId,
-                    ActionId = 1,
-                    SubjectId = 1
-                },
-                new RolePermission
-                {
-                    Id = 7,
-                    RoleId = editorId,
+                    Id = 1,
+                    LicenseId = defaultLicenseId,
                     ActionId = 2,
                     SubjectId = 1
                 },
-                new RolePermission
+                new LicensePermission
                 {
-                    Id = 8,
-                    RoleId = editorId,
+                    Id = 2,
+                    LicenseId = defaultLicenseId,
                     ActionId = 3,
                     SubjectId = 1
                 },
-                new RolePermission
+                new LicensePermission
                 {
-                    Id = 9,
-                    RoleId = editorId,
+                    Id = 3,
+                    LicenseId = defaultLicenseId,
                     ActionId = 4,
                     SubjectId = 1
                 },
-                new RolePermission
+                new LicensePermission
                 {
                     Id = 10,
-                    RoleId = editorId,
-                    ActionId = 5,
+                    LicenseId = defaultLicenseId,
+                    ActionId = 1,
+                    SubjectId = 2
+                },
+                new LicensePermission
+                {
+                    Id = 101,
+                    LicenseId = adminLicenseId,
+                    ActionId = 2,
                     SubjectId = 1
+                },
+                new LicensePermission
+                {
+                    Id = 102,
+                    LicenseId = adminLicenseId,
+                    ActionId = 3,
+                    SubjectId = 1
+                },
+                new LicensePermission
+                {
+                    Id = 103,
+                    LicenseId = adminLicenseId,
+                    ActionId = 4,
+                    SubjectId = 1
+                },
+                new LicensePermission
+                {
+                    Id = 110,
+                    LicenseId = adminLicenseId,
+                    ActionId = 1,
+                    SubjectId = 2
+                },
+                new LicensePermission
+                {
+                    Id = 120,
+                    LicenseId = adminLicenseId,
+                    ActionId = 1,
+                    SubjectId = 3
+                },
+                new LicensePermission
+                {
+                    Id = 121,
+                    LicenseId = adminLicenseId,
+                    ActionId = 2,
+                    SubjectId = 3
+                },
+                new LicensePermission
+                {
+                    Id = 122,
+                    LicenseId = adminLicenseId,
+                    ActionId = 3,
+                    SubjectId = 3
+                },
+                new LicensePermission
+                {
+                    Id = 123,
+                    LicenseId = adminLicenseId,
+                    ActionId = 4,
+                    SubjectId = 3
                 });
         }
     }
