@@ -40,7 +40,7 @@ namespace CoachAssistent.Managers
             return mapper.Map<SegmentViewModel>(segment);
         }
 
-        public async Task<Guid> Create(SegmentViewModel viewModel)
+        public async Task<Guid> Create(CreateSegmentViewModel viewModel)
         {
             IQueryable<Exercise> exercises = dbContext
                 .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id));
@@ -78,6 +78,9 @@ namespace CoachAssistent.Managers
                 .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
 
             segment.Shareable!.Editors = CondenseEditors(viewModel.Editors, segment.Shareable);
+            segment.Shareable!.SharingLevel = (SharingLevel)viewModel.SharingLevel;
+            segment.Shareable!.ShareablesXGroups = CondenseGroups(viewModel.GroupIds);
+
             await dbContext.SaveChangesAsync();
         }
 

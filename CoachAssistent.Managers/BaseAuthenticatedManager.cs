@@ -69,7 +69,7 @@ namespace CoachAssistent.Managers
                         (c.Shareable!.SharingLevel == SharingLevel.Public)
                     ||
                         //private
-                        (c.Shareable.SharingLevel == SharingLevel.Private && c.Shareable.Editors.Select(e => e.UserId).Contains(userId))
+                        (/*c.Shareable.SharingLevel == SharingLevel.Private && */c.Shareable.Editors.Select(e => e.UserId).Contains(userId))
                     ||
                         //group
                         (c.Shareable.SharingLevel == SharingLevel.Group

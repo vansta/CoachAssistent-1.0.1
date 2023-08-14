@@ -32,7 +32,7 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpPost]
-        public Task<Guid> Create(SegmentViewModel segment)
+        public Task<Guid> Create(CreateSegmentViewModel segment)
         {
             return segmentManager.Create(segment);
         }
