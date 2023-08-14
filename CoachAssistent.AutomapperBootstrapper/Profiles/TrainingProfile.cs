@@ -13,10 +13,13 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
     {
         public TrainingProfile()
         {
-            CreateMap<Training, TrainingOverviewItemViewModel>();
-                //.ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises.Select(e => e.Name)));
+            CreateMap<Training, TrainingOverviewItemViewModel>()
+                .ForMember(dest => dest.SharingLevel, opt => opt.MapFrom(src => (int)src.Shareable!.SharingLevel))
+                .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.Shareable!.ShareablesXGroups.Select(sg => sg.GroupId)));
 
-            CreateMap<Training, TrainingViewModel>();
+            CreateMap<Training, TrainingViewModel>()
+                .ForMember(dest => dest.SharingLevel, opt => opt.MapFrom(src => (int)src.Shareable!.SharingLevel))
+                .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.Shareable!.ShareablesXGroups.Select(sg => sg.GroupId)));
         }
     }
 }

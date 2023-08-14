@@ -59,6 +59,7 @@ namespace CoachAssistent.Managers
             }
             else
             {
+                var test = collection.ToList();
                 Guid userId = authenticationWrapper.UserId;
                 IEnumerable<Guid> groupIds = authenticationWrapper.User.GroupIds;
                 collection = collection

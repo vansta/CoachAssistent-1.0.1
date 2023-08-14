@@ -14,11 +14,13 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
         public SegmentProfile()
         {
             CreateMap<Segment, SegmentOverviewItemViewModel>()
-                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.Exercises.Select(e => e.Name)))
+                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.SegmentsXExercises.OrderBy(se => se.Index).Select(se => se.Exercise!.Name)))
+                .ForMember(dest => dest.SharingLevel, opt => opt.MapFrom(src => (int)src.Shareable!.SharingLevel))
                 .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.Shareable!.ShareablesXGroups.Select(sg => sg.GroupId)));
 
             CreateMap<Segment, SegmentViewModel>()
-                .ForMember(dest => dest.SharingLevel, opt => opt.MapFrom(src => src.Shareable!.SharingLevel))
+                .ForMember(dest => dest.Exercises, opt => opt.MapFrom(src => src.SegmentsXExercises.OrderBy(se => se.Index).Select(se => se.Exercise)))
+                .ForMember(dest => dest.SharingLevel, opt => opt.MapFrom(src => (int)src.Shareable!.SharingLevel))
                 .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.Shareable!.ShareablesXGroups.Select(sg => sg.GroupId)));
         }
     }

@@ -19,7 +19,6 @@ namespace CoachAssistent.Models.ViewModels.Segment
         }
         public string Name { get; set; }
         public string? Description { get; set; }
-        public int SharingLevel { get; set; }
         public ICollection<ExerciseOverviewItemViewModel> Exercises { get; set; }
         public ICollection<Guid> Editors { get; set; }
     }

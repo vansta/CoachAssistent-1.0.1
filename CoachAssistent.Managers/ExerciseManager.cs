@@ -143,7 +143,6 @@ namespace CoachAssistent.Managers
             exercise.Tags = CondenseTags(viewModel.Tags);
 
             exercise.Shareable!.SharingLevel = viewModel.SharingLevel;
-
             exercise.Shareable.Editors = CondenseEditors(viewModel.Editors, exercise.Shareable);
             exercise.Shareable.ShareablesXGroups = CondenseGroups(viewModel.GroupIds, exercise.Shareable);
 

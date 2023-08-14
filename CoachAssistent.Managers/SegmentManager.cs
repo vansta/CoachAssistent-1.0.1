@@ -20,7 +20,8 @@ namespace CoachAssistent.Managers
         public OverviewViewModel<SegmentOverviewItemViewModel> GetSegments()
         {
             IQueryable<Segment> segments = dbContext.Segments
-                .Include(s => s.Exercises)
+                .Include(s => s.SegmentsXExercises.OrderBy(se => se.Index))
+                    .ThenInclude(se => se.Exercise)
                 .Include(s => s.Shareable!.ShareablesXGroups);
             segments = FilterBySharingLevel(segments);
             return new OverviewViewModel<SegmentOverviewItemViewModel>
@@ -34,7 +35,11 @@ namespace CoachAssistent.Managers
         public async Task<SegmentViewModel> GetSegment(Guid id)
         {
             Segment? segment = await dbContext.Segments
-                .Include(s => s.Exercises).ThenInclude(e => e.Attachments)
+                .Include(s => s.Exercises)
+                    .ThenInclude(e => e.Attachments)
+                .Include(s => s.SegmentsXExercises.OrderBy(se => se.Index))
+                    .ThenInclude(se => se.Exercise)
+                    .ThenInclude(e => e!.Shareable)
                 .Include(s => s.Shareable!.ShareablesXGroups)
                 .SingleAsync(s => s.Id.Equals(id));
             return mapper.Map<SegmentViewModel>(segment);
@@ -51,9 +56,10 @@ namespace CoachAssistent.Managers
                 Exercises = exercises.ToHashSet(),
                 Shareable = new Shareable
                 {
-                    SharingLevel = (SharingLevel)viewModel.SharingLevel,
+                    SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel),
                     Editors = CondenseEditors(viewModel.Editors),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) }
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) },
+                    ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
                 }
             };
             segment = (await dbContext.Segments.AddAsync(segment)).Entity;
@@ -65,8 +71,10 @@ namespace CoachAssistent.Managers
         public async Task Update(SegmentViewModel viewModel)
         {
             Segment segment = await dbContext.Segments
-                .Include(s => s.Exercises)
+                //.Include(s => s.Exercises)
+                .Include(s => s.SegmentsXExercises)
                 .Include(s => s.Shareable!.Editors)
+                .Include(s => s.Shareable!.ShareablesXGroups)
                 .SingleAsync(s => s.Id.Equals(viewModel.Id));
 
             segment.Name = viewModel.Name;
@@ -74,11 +82,31 @@ namespace CoachAssistent.Managers
 
             await AddHistoryLog(segment.ShareableId, EditActionType.Edit);
 
-            segment.Exercises = dbContext
-                .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
+            int exerciseIndex = 0;
+            segment.SegmentsXExercises = viewModel.Exercises
+                .Select(e =>
+                {
+                    SegmentXExercise? segmentXExercise = segment.SegmentsXExercises.FirstOrDefault(se => se.ExerciseId.Equals(e.Id));
+                    if (segmentXExercise is null)
+                    {
+                        return new SegmentXExercise
+                        {
+                            ExerciseId = e.Id,
+                            Index = exerciseIndex
+                        };
+                    }
+                    else
+                    {
+                        segmentXExercise.Index = exerciseIndex;
+                    }
+                    exerciseIndex++;
+                    return segmentXExercise;
+                }).ToList();
+            //segment.Exercises = dbContext
+            //    .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id)).ToHashSet();
 
             segment.Shareable!.Editors = CondenseEditors(viewModel.Editors, segment.Shareable);
-            segment.Shareable!.SharingLevel = (SharingLevel)viewModel.SharingLevel;
+            segment.Shareable!.SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel);
             segment.Shareable!.ShareablesXGroups = CondenseGroups(viewModel.GroupIds);
 
             await dbContext.SaveChangesAsync();

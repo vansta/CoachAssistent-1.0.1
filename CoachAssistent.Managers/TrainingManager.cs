@@ -25,6 +25,8 @@ namespace CoachAssistent.Managers
         public OverviewViewModel<TrainingOverviewItemViewModel> GetTrainings()
         {
             IQueryable<Training> trainings = dbContext.Trainings
+                .Include(t => t.Shareable!.ShareablesXGroups)
+                .Include(t => t.Shareable!.Editors)
                 .Include(t => t.Segments)
                 .ThenInclude(s => s.Exercises);
             trainings = FilterBySharingLevel(trainings);
@@ -39,31 +41,32 @@ namespace CoachAssistent.Managers
         public async Task<TrainingViewModel> GetTraining(Guid id)
         {
             Training? training = await dbContext.Trainings
-                .Include(t => t.Segments)
-                .ThenInclude(s => s.Exercises)
-                .ThenInclude(e => e.Attachments)
+                .Include(t => t.Shareable!.ShareablesXGroups)
+                .Include(t => t.Segments!)
+                    .ThenInclude(s => s.Shareable)
+                .Include(t => t.Segments!)
+                    .ThenInclude(s => s.Exercises)
+                    .ThenInclude(e => e.Attachments)
                 .SingleAsync(s => s.Id.Equals(id));
             return mapper.Map<TrainingViewModel>(training);
         }
 
         public async Task<Guid> Create(TrainingViewModel viewModel)
         {
-            //IQueryable<Exercise> exercises = dbContext
-            //    .Exercises.Where(e => viewModel.Exercises.Select(x => x.Id).Contains(e.Id));
             Training training = new()
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
-                //Editors = new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } },
                 Shareable = new Shareable
                 {
-                    //SharingLevel = viewModel.
-                    //Editors = CondenseEditors(viewModel.Editors),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) }
-                }
+                    SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel),
+                    Editors = CondenseEditors(viewModel.Editors),
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) },
+                    ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
+                },
+                Segments = dbContext
+                    .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet()
             };
-            training.Segments = dbContext
-                .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
             training = (await dbContext.Trainings.AddAsync(training)).Entity;
             await dbContext.SaveChangesAsync();
 
@@ -73,12 +76,18 @@ namespace CoachAssistent.Managers
         public async Task Update(TrainingViewModel viewModel)
         {
             Training training = await dbContext.Trainings
+                .Include(t => t.Shareable!.Editors)
+                .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Segments)
-                .ThenInclude(s => s.Exercises)
+                    .ThenInclude(s => s.Exercises)
                 .SingleAsync(s => s.Id.Equals(viewModel.Id));
 
             training.Name = viewModel.Name;
             training.Description = viewModel.Description;
+
+            training.Shareable!.SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel);
+            training.Shareable.Editors = CondenseEditors(viewModel.Editors, training.Shareable);
+            training.Shareable.ShareablesXGroups = CondenseGroups(viewModel.GroupIds, training.Shareable);
 
             training.Segments = dbContext
                 .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
