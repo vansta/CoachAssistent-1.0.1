@@ -22,7 +22,8 @@ namespace CoachAssistent.Managers
             IQueryable<Segment> segments = dbContext.Segments
                 .Include(s => s.SegmentsXExercises.OrderBy(se => se.Index))
                     .ThenInclude(se => se.Exercise)
-                .Include(s => s.Shareable!.ShareablesXGroups);
+                .Include(s => s.Shareable!.ShareablesXGroups)
+                .Include(s => s.Shareable!.Editors);
             segments = FilterBySharingLevel(segments);
             return new OverviewViewModel<SegmentOverviewItemViewModel>
             {
@@ -41,6 +42,7 @@ namespace CoachAssistent.Managers
                     .ThenInclude(se => se.Exercise)
                     .ThenInclude(e => e!.Shareable)
                 .Include(s => s.Shareable!.ShareablesXGroups)
+                .Include(s => s.Shareable!.Editors)
                 .SingleAsync(s => s.Id.Equals(id));
             return mapper.Map<SegmentViewModel>(segment);
         }

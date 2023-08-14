@@ -42,6 +42,7 @@ namespace CoachAssistent.Managers
         {
             Training? training = await dbContext.Trainings
                 .Include(t => t.Shareable!.ShareablesXGroups)
+                .Include(t => t.Shareable!.Editors)
                 .Include(t => t.Segments!)
                     .ThenInclude(s => s.Shareable)
                 .Include(t => t.Segments!)
