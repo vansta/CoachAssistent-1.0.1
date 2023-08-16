@@ -356,6 +356,7 @@ namespace CoachAssistent.Data
                     ActionId = 1,
                     SubjectId = 2
                 },
+
                 new LicensePermission
                 {
                     Id = 101,

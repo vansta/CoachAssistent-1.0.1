@@ -48,7 +48,7 @@ namespace CoachAssistent.Managers
             return new OverviewViewModel<ExerciseOverviewItemViewModel>
             {
                 Items = exercises.Select(e => mapper.Map<ExerciseOverviewItemViewModel>(e)),
-                TotalItems = exercises.Count()
+                TotalCount = exercises.Count()
             };
         }
 

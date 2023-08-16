@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Permission;
+using CoachAssistent.Models.ViewModels.User;
 
 namespace CoachAssistent.Api.Controllers
 {
@@ -25,6 +26,12 @@ namespace CoachAssistent.Api.Controllers
         public IEnumerable<SelectViewModel> GetAvailableEditors()
         {
             return userManager.GetAvailableEditors();
+        }
+
+        [HttpGet("Profile")]
+        public Task<ProfileViewModel> GetProfile()
+        {
+            return userManager.GetProfile();
         }
 
         [HttpGet("AssignedEditors")]

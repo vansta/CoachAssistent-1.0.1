@@ -106,5 +106,12 @@ namespace CoachAssistent.Managers
 
             await dbContext.SaveChangesAsync();
         }
+
+        public IEnumerable<SelectViewModel> GetAvailableGroups()
+        {
+            return dbContext.Groups
+                .Select(g => new SelectViewModel(g.Id, g.Name))
+                .ToList();
+        }
     }
 }

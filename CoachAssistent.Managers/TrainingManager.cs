@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using CoachAssistent.Common.Enums;
 using CoachAssistent.Data;
 using CoachAssistent.Managers.Helpers;
@@ -22,19 +23,23 @@ namespace CoachAssistent.Managers
         {
 
         }
-        public OverviewViewModel<TrainingOverviewItemViewModel> GetTrainings()
+        public OverviewViewModel<TrainingOverviewItemViewModel> GetTrainings(BaseSearchViewModel request)
         {
             IQueryable<Training> trainings = dbContext.Trainings
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
                 .Include(t => t.Segments)
                 .ThenInclude(s => s.Exercises);
+            if (!string.IsNullOrEmpty(request.Search))
+            {
+                trainings = trainings.Where(s => s.Name.Contains(request.Search));
+            }
             trainings = FilterBySharingLevel(trainings);
             return new OverviewViewModel<TrainingOverviewItemViewModel>
             {
                 Items = trainings
                     .Select(s => mapper.Map<TrainingOverviewItemViewModel>(s)),
-                TotalItems = trainings.Count()
+                TotalCount = trainings.Count()
             };
         }
 

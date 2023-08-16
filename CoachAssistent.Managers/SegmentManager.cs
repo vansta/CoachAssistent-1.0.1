@@ -5,8 +5,10 @@ using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Segment;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
 
 namespace CoachAssistent.Managers
 {
@@ -17,19 +19,24 @@ namespace CoachAssistent.Managers
         {
 
         }
-        public OverviewViewModel<SegmentOverviewItemViewModel> GetSegments()
+        public OverviewViewModel<SegmentOverviewItemViewModel> GetSegments(BaseSearchViewModel request)
         {
             IQueryable<Segment> segments = dbContext.Segments
                 .Include(s => s.SegmentsXExercises.OrderBy(se => se.Index))
                     .ThenInclude(se => se.Exercise)
                 .Include(s => s.Shareable!.ShareablesXGroups)
                 .Include(s => s.Shareable!.Editors);
+            if (!string.IsNullOrEmpty(request.Search))
+            {
+                segments = segments.Where(s => s.Name.Contains(request.Search));
+            }
+            
             segments = FilterBySharingLevel(segments);
             return new OverviewViewModel<SegmentOverviewItemViewModel>
             {
                 Items = segments
                     .Select(s => mapper.Map<SegmentOverviewItemViewModel>(s)),
-                TotalItems = segments.Count()
+                TotalCount = segments.Count()
             };
         }
 

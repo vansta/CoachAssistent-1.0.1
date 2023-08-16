@@ -26,9 +26,9 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpGet("Overview")]
-        public OverviewViewModel<SegmentOverviewItemViewModel> GetSegments()
+        public OverviewViewModel<SegmentOverviewItemViewModel> GetSegments([FromQuery] BaseSearchViewModel request)
         {
-            return segmentManager.GetSegments();
+            return segmentManager.GetSegments(request);
         }
 
         [HttpPost]

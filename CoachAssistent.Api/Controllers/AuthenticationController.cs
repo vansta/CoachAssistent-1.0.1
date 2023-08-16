@@ -2,6 +2,7 @@
 using CoachAssistent.Data;
 using CoachAssistent.Managers;
 using CoachAssistent.Models.ViewModels.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,13 @@ namespace CoachAssistent.Api.Controllers
         public AuthenticationController(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration)
         {
             accountManager = new AccountManager(dbContext, mapper, configuration);
+        }
+
+        [Authorize]
+        [HttpGet("CheckToken")]
+        public string CheckToken()
+        {
+            return "Ok";
         }
 
         [HttpPost]

@@ -139,13 +139,11 @@ namespace CoachAssistent.Managers
 
         public IEnumerable<RolePermissionViewModel> GetPermissions()
         {
-            //IEnumerable<SubjectCondition> subjectConditions = new List<SubjectCondition>();
-            //_configuration.GetSection("SubjectConditions")
-            //    .Bind(subjectConditions);
-            //Dictionary<string, string> conditions = subjectConditions
-            //    .Select(sc => new KeyValuePair<string, string>(sc.Subject, sc.Condition))
-
-            var groupPermissions = dbContext.Members
+            List<RolePermissionViewModel> permissions = new List<RolePermissionViewModel>();
+            Guid licenseId;
+            if (authenticationWrapper.IsLoggedIn)
+            {
+                var groupPermissions = dbContext.Members
                 .Include(m => m.Role!.RolePermissions)
                     .ThenInclude(rp => rp.Action)
                 .Include(m => m.Role!.RolePermissions)
@@ -162,9 +160,21 @@ namespace CoachAssistent.Managers
                     Ids = new List<Guid> { m.GroupId },
                     Condition = rp.Subject!.Name == "group" ? "id" : "groupIds"
                 })).ToList();
+                permissions = groupPermissions;
+                licenseId = authenticationWrapper.LicenseId;
+            }
+            else
+            {
+                permissions = new List<RolePermissionViewModel>();
+                licenseId = dbContext.Licenses
+                    .OrderBy(l => l.Level)
+                    .First().Id;
+            }
+
+            
 
             var licensePermissions = dbContext.LicensePermissions
-                .Where(lp => lp.LicenseId.Equals(authenticationWrapper.LicenseId))
+                .Where(lp => lp.LicenseId.Equals(licenseId))
                 .Select(lp => new RolePermissionViewModel
                 {
                     Action = lp.Action!.Name,
@@ -176,9 +186,9 @@ namespace CoachAssistent.Managers
                     Condition = lp.Subject!.Name == "group" ? "none" : "editors"
                 }).ToList();
 
-            groupPermissions.AddRange(licensePermissions);
+            permissions.AddRange(licensePermissions);
 
-            return groupPermissions;
+            return permissions;
         }
     }
 }
