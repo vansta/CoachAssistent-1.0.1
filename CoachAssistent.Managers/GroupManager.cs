@@ -38,12 +38,14 @@ namespace CoachAssistent.Managers
         {
             Group group = new()
             {
+                ParentGroupId = createGroupViewModel.ParentGroupId,
                 Name = createGroupViewModel.Name ?? "New group",
                 Description = createGroupViewModel.Description,
                 Tags = CondenseTags(createGroupViewModel.Tags),
                 Members = createGroupViewModel.Members is not null ? createGroupViewModel.Members.Select(m => new Member() { UserId = m.UserId, RoleId = m.RoleId }).ToList()
-                : new List<Member>()
-            };
+                : new List<Member>(),
+                SubGroups = dbContext.Groups.Where(g => createGroupViewModel.SubGroups.Select(sg => sg.Id).Contains(g.Id)).ToHashSet()
+        };
 
             var addGroup = await dbContext.Groups.AddAsync(group);
             await dbContext.SaveChangesAsync();
@@ -69,6 +71,7 @@ namespace CoachAssistent.Managers
             Group group = await dbContext.Groups
                 .Include(g => g.Members)
                 .Include(g => g.Tags)
+                .Include(g => g.SubGroups)
                 .Include(g => g.MembershipRequests)
                     .ThenInclude(mr => mr.User)
                 .SingleAsync(g => g.Id.Equals(id));
@@ -81,6 +84,7 @@ namespace CoachAssistent.Managers
             Group group = await dbContext.Groups
                 .Include(g => g.Members)
                 .Include(g => g.Tags)
+                .Include(g => g.SubGroups)
                 .SingleAsync(g => g.Id.Equals(editGroupViewModel.Id));
 
             group.Name = editGroupViewModel.Name ?? "New group";
@@ -107,15 +111,29 @@ namespace CoachAssistent.Managers
                     return member;
                 }).ToList();
             };
+            group.SubGroups = dbContext.Groups.Where(g => editGroupViewModel.SubGroups.Select(sg => sg.Id).Contains(g.Id)).ToHashSet();
 
             await dbContext.SaveChangesAsync();
         }
 
-        public IEnumerable<SelectViewModel> GetAvailableGroups()
+        public IEnumerable<SelectViewModel> GetAvailableGroups(string? action)
         {
-            return dbContext.Groups
-                .Select(g => new SelectViewModel(g.Id, g.Name))
-                .ToList();
+            IQueryable<Group> groups;
+            if (string.IsNullOrEmpty(action))
+            {
+                groups = dbContext.Groups;
+            }
+            else
+            {
+                groups = dbContext.Members
+                    .Include(m => m.Role!.RolePermissions).ThenInclude(rp => rp.Action)
+                    .Include(m => m.Role!.RolePermissions).ThenInclude(rp => rp.Subject)
+                    .Include(m => m.Group)
+                    .Where(m => m.UserId == authenticationWrapper.UserId && m.Role!.RolePermissions.Any(rp => rp.Action!.Name.Equals(action) && rp.Subject!.Name.Equals("group")))
+                    .Select(m => m.Group!);
+            }
+            return groups.Select(g => new SelectViewModel(g.Id, g.Name))
+                    .ToList();
         }
 
         public async Task RespondToMembershipRequest(MembershipRequestResponseViewModel response)
