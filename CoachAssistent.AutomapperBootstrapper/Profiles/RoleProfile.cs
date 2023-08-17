@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.Domain.Permissions;
+using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Permission;
 using CoachAssistent.Models.ViewModels.Role;
 using System;
@@ -18,7 +19,7 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
             CreateMap<Role, RoleOverviewItemViewModel>();
 
             CreateMap<RolePermission, RolePermissionOverviewItemViewModel>()
-                .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.Fields.Select(f => f.PermissionField!.Name)));
+                .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.Fields.Select(f => f.PermissionFieldId)));
         }
     }
 }

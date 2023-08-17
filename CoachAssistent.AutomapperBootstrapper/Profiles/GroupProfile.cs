@@ -14,10 +14,13 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
         public GroupProfile()
         {
             CreateMap<Group, GroupOverviewItemViewModel>()
-                .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags.Select(t => t.Name).Distinct()));
+                .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags.Select(t => t.Name).Distinct()))
+                .ForMember(dest => dest.Members, opts => opts.MapFrom(src => src.Members.Count))
+                .ForMember(dest => dest.MembershipRequests, opts => opts.MapFrom(src => src.MembershipRequests.Count));
 
             CreateMap<Group, EditGroupViewModel>()
-                .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags.Select(t => t.Name).Distinct()));
+                .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags.Select(t => t.Name).Distinct()))
+                .ForMember(dest => dest.MembershipRequests, opts => opts.MapFrom(src => src.MembershipRequests.Where(mr => !mr.ResponseTimestamp.HasValue)));
         }
     }
 }

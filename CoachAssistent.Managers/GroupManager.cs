@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
-using CoachAssistent.Data.Migrations;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Group;
+using CoachAssistent.Models.ViewModels.Member;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -57,6 +57,8 @@ namespace CoachAssistent.Managers
             {
                 Items = dbContext.Groups
                     .Include(g => g.Tags)
+                    .Include(g => g.Members)
+                    .Include(g => g.MembershipRequests.Where(mr => !mr.ResponseTimestamp.HasValue))
                     .Where(g => g.Members.Select(m => m.UserId).Contains(authenticationWrapper.UserId))
                     .Select(g => mapper.Map<GroupOverviewItemViewModel>(g))
             };
@@ -67,6 +69,8 @@ namespace CoachAssistent.Managers
             Group group = await dbContext.Groups
                 .Include(g => g.Members)
                 .Include(g => g.Tags)
+                .Include(g => g.MembershipRequests)
+                    .ThenInclude(mr => mr.User)
                 .SingleAsync(g => g.Id.Equals(id));
 
             return mapper.Map<EditGroupViewModel>(group);
@@ -112,6 +116,25 @@ namespace CoachAssistent.Managers
             return dbContext.Groups
                 .Select(g => new SelectViewModel(g.Id, g.Name))
                 .ToList();
+        }
+
+        public async Task RespondToMembershipRequest(MembershipRequestResponseViewModel response)
+        {
+            MembershipRequest? membershipRequest = await dbContext.MembershipRequests.FindAsync(response.Id);
+            if (membershipRequest is not null)
+            {
+                if (response.Response)
+                {
+                    Member member = new()
+                    {
+                        GroupId = membershipRequest.GroupId,
+                        UserId = membershipRequest.UserId,
+                        RoleId = response.RoleId!.Value
+                    };
+                    await dbContext.Members.AddAsync(member);
+                }
+                membershipRequest.ResponseTimestamp = DateTime.Now;
+                await dbContext.SaveChangesAsync();           }
         }
     }
 }

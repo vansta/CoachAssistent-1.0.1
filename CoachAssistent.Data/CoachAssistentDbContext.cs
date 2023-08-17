@@ -25,6 +25,7 @@ namespace CoachAssistent.Data
         public DbSet<TrainingXSegment> TrainingsXSegments => Set<TrainingXSegment>();
         public DbSet<Editor> Editors => Set<Editor>();
         public DbSet<Member> Members => Set<Member>();
+        public DbSet<MembershipRequest> MembershipRequests => Set<MembershipRequest>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<HistoryLog> HistoryLogs => Set<HistoryLog>();
         public DbSet<Shareable> Shareables => Set<Shareable>();
@@ -242,6 +243,12 @@ namespace CoachAssistent.Data
                     Name = "member",
                     SubjectId = 2
                 },
+                new PermissionField
+                {
+                    Id = 33,
+                    Name = "subgroup",
+                    SubjectId = 2
+                },
                 //role
                 new PermissionField
                 {
@@ -412,6 +419,80 @@ namespace CoachAssistent.Data
                     LicenseId = adminLicenseId,
                     ActionId = 4,
                     SubjectId = 3
+                });
+
+            modelBuilder.Entity<LicensePermissionXPermissionField>()
+                .HasData(new LicensePermissionXPermissionField
+                {
+                    Id = 101,
+                    LicensePermissionId = 120,
+                    PermissionFieldId = 50
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 102,
+                    LicensePermissionId = 120,
+                    PermissionFieldId = 51
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 103,
+                    LicensePermissionId = 120,
+                    PermissionFieldId = 52
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 104,
+                    LicensePermissionId = 121,
+                    PermissionFieldId = 50
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 105,
+                    LicensePermissionId = 121,
+                    PermissionFieldId = 51
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 106,
+                    LicensePermissionId = 121,
+                    PermissionFieldId = 52
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 107,
+                    LicensePermissionId = 122,
+                    PermissionFieldId = 50
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 108,
+                    LicensePermissionId = 122,
+                    PermissionFieldId = 51
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 109,
+                    LicensePermissionId = 122,
+                    PermissionFieldId = 52
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 110,
+                    LicensePermissionId = 123,
+                    PermissionFieldId = 50
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 111,
+                    LicensePermissionId = 123,
+                    PermissionFieldId = 51
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 112,
+                    LicensePermissionId = 123,
+                    PermissionFieldId = 52
                 });
         }
     }

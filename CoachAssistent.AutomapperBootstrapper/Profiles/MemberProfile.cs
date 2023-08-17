@@ -14,6 +14,9 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
         public MemberProfile()
         {
             CreateMap<Member, CreateMemberViewModel>();
+
+            CreateMap<MembershipRequest, MembershipRequestViewModel>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User!.UserName));
         }
     }
 }

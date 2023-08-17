@@ -15,6 +15,8 @@ namespace CoachAssistent.Models.Domain
             Members = new HashSet<Member>();
             Tags = new HashSet<Tag>();
             ShareablesXGroups = new HashSet<ShareablesXGroups>();
+            MembershipRequests = new HashSet<MembershipRequest>();
+            SubGroups = new HashSet<Group>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -22,8 +24,12 @@ namespace CoachAssistent.Models.Domain
         [MaxLength(1024)]
         public string? Description { get; set; }
 
+        public Guid? ParentGroupId { get; set; }
+        public Group? ParentGroup { get; set; }
         public ICollection<Member> Members { get; set; }
         public ICollection<Tag> Tags { get; set; }
         public ICollection<ShareablesXGroups> ShareablesXGroups { get; set; }
+        public ICollection<MembershipRequest> MembershipRequests { get; set; }
+        public ICollection<Group> SubGroups { get; set; }
     }
 }

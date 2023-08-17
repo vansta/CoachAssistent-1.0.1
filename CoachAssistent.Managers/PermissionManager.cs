@@ -34,7 +34,7 @@ namespace CoachAssistent.Managers
                 .Include(ps => ps.Fields)
                 .Select(ps => new PermissionSubjectSelectViewModel(ps.Id, ps.Name)
                 {
-                    Fields = ps.Fields.Select(f => f.Name)
+                    Fields = ps.Fields.Select(f => new SelectViewModel(f.Id, f.Name))
                 });
         }
     }

@@ -12,6 +12,6 @@ namespace CoachAssistent.Models.ViewModels.Permission
         {
 
         }
-        public IEnumerable<string> Fields { get; set; } = new List<string>();
+        public IEnumerable<SelectViewModel> Fields { get; set; } = new List<SelectViewModel>();
     }
 }

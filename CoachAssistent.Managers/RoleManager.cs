@@ -66,7 +66,7 @@ namespace CoachAssistent.Managers
             {
                 role.RolePermissions = roleViewModel.RolePermissions.Select(x =>
                 {
-                    RolePermission? rolePermission = role.RolePermissions.FirstOrDefault(rp => rp.Id.Equals(x.Id));
+                    RolePermission? rolePermission = role.RolePermissions.FirstOrDefault(rp => rp.Id == x.Id);
                     if (rolePermission is null)
                     {
                         rolePermission = new RolePermission
@@ -80,7 +80,7 @@ namespace CoachAssistent.Managers
                         {
                             rolePermission.Fields = x.Fields.Select(f =>
                             {
-                                int permissionFieldId = dbContext.PermissionFields.Single(pf => pf.SubjectId == subjectId && pf.Name.Equals(f)).Id;
+                                int permissionFieldId = dbContext.PermissionFields.Single(pf => pf.SubjectId == subjectId && pf.Id == int.Parse(f)).Id;
                                 return new RolePermissionXPermissionField
                                 {
                                     PermissionFieldId = permissionFieldId
@@ -92,9 +92,9 @@ namespace CoachAssistent.Managers
                     {
                         rolePermission.Fields = x.Fields.Select(f =>
                         {
-                            RolePermissionXPermissionField? rolePermissionXPermissionField = rolePermission?.Fields.FirstOrDefault(rppf => rppf.PermissionField!.Name.Equals(f));
+                            RolePermissionXPermissionField? rolePermissionXPermissionField = rolePermission?.Fields.FirstOrDefault(rppf => rppf.PermissionFieldId == int.Parse(f));
 
-                            return rolePermissionXPermissionField ?? new RolePermissionXPermissionField { PermissionFieldId = dbContext.PermissionFields.Single(pf => pf.SubjectId == rolePermission!.SubjectId && pf.Name.Equals(f)).Id };
+                            return rolePermissionXPermissionField ?? new RolePermissionXPermissionField { PermissionFieldId = dbContext.PermissionFields.Single(pf => pf.SubjectId == rolePermission!.SubjectId && pf.Id == int.Parse(f)).Id };
                         }).ToList();
                     }
                     return rolePermission;

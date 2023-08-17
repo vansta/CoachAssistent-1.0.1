@@ -6,6 +6,7 @@ using CoachAssistent.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using CoachAssistent.Models.ViewModels.Group;
+using CoachAssistent.Models.ViewModels.Member;
 
 namespace CoachAssistent.Api.Controllers
 {
@@ -54,6 +55,12 @@ namespace CoachAssistent.Api.Controllers
         public async Task UpdateGroup(EditGroupViewModel editGroupViewModel)
         {
             await groupManager.UpdateGroup(editGroupViewModel);
+        }
+
+        [HttpPut("Request")]
+        public async Task RespondToMembershipRequest(MembershipRequestResponseViewModel response)
+        {
+            await groupManager.RespondToMembershipRequest(response);
         }
     }
 }

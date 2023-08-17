@@ -45,5 +45,11 @@ namespace CoachAssistent.Api.Controllers
         {
             return userManager.GetPermissions();
         }
+
+        [HttpPut]
+        public Task UpdateUser(ProfileViewModel profileViewModel)
+        {
+            return userManager.UpdateUser(profileViewModel);
+        }
     }
 }

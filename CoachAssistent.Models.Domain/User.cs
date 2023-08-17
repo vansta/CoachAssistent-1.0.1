@@ -12,6 +12,7 @@ namespace CoachAssistent.Models.Domain
             Key = new byte[32];
 
             Memberships = new HashSet<Member>();
+            MembershipRequests = new HashSet<MembershipRequest>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -32,5 +33,6 @@ namespace CoachAssistent.Models.Domain
         public Guid LicenseId { get; set; }
         public License? License { get; set; }
         public ICollection<Member> Memberships { get; set; }
+        public ICollection<MembershipRequest> MembershipRequests { get; set; }
     }
 }

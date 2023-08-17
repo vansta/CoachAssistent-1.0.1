@@ -4,6 +4,7 @@ using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.Domain.Permissions;
 using CoachAssistent.Models.ViewModels;
+using CoachAssistent.Models.ViewModels.Member;
 using CoachAssistent.Models.ViewModels.Permission;
 using CoachAssistent.Models.ViewModels.User;
 using Microsoft.EntityFrameworkCore;
@@ -58,13 +59,31 @@ namespace CoachAssistent.Managers
 
             foreach (var groupId in profileViewModel.Memberships.Where(g => !user.Memberships.Select(m => m.GroupId).Contains(g)))
             {
-                await RequestGroupAccess(authenticationWrapper.UserId, groupId);
+                await RequestGroupAccess(new MembershipRequestViewModel
+                {
+                    UserId = authenticationWrapper.UserId,
+                    GroupId = groupId
+                });
             }
         }
 
-        private Task RequestGroupAccess(Guid userId, Guid groupId)
+        private async Task RequestGroupAccess(MembershipRequestViewModel request)
         {
-            throw new NotImplementedException();
+            MembershipRequest? membershipRequest = dbContext.MembershipRequests
+                .FirstOrDefault(mr => mr.UserId.Equals(request.UserId) && mr.GroupId.Equals(request.GroupId) && !mr.ResponseTimestamp.HasValue);
+
+            if (membershipRequest is null)
+            {
+                membershipRequest = new MembershipRequest
+                {
+                    UserId = request.UserId,
+                    GroupId = request.GroupId,
+                    Description = request.Description,
+                    RequestTimestamp = DateTime.Now
+                };
+                await dbContext.MembershipRequests.AddAsync(membershipRequest);
+            }
+            await dbContext.SaveChangesAsync();
         }
     }
 }

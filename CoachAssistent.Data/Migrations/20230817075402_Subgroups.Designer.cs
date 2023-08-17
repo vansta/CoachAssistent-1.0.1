@@ -4,6 +4,7 @@ using CoachAssistent.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    partial class CoachAssistentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230817075402_Subgroups")]
+    partial class Subgroups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,80 +393,6 @@ namespace CoachAssistent.Data.Migrations
                     b.HasIndex("PermissionFieldId");
 
                     b.ToTable("LicensePermissionXPermissionFields");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 101,
-                            LicensePermissionId = 120,
-                            PermissionFieldId = 50
-                        },
-                        new
-                        {
-                            Id = 102,
-                            LicensePermissionId = 120,
-                            PermissionFieldId = 51
-                        },
-                        new
-                        {
-                            Id = 103,
-                            LicensePermissionId = 120,
-                            PermissionFieldId = 52
-                        },
-                        new
-                        {
-                            Id = 104,
-                            LicensePermissionId = 121,
-                            PermissionFieldId = 50
-                        },
-                        new
-                        {
-                            Id = 105,
-                            LicensePermissionId = 121,
-                            PermissionFieldId = 51
-                        },
-                        new
-                        {
-                            Id = 106,
-                            LicensePermissionId = 121,
-                            PermissionFieldId = 52
-                        },
-                        new
-                        {
-                            Id = 107,
-                            LicensePermissionId = 122,
-                            PermissionFieldId = 50
-                        },
-                        new
-                        {
-                            Id = 108,
-                            LicensePermissionId = 122,
-                            PermissionFieldId = 51
-                        },
-                        new
-                        {
-                            Id = 109,
-                            LicensePermissionId = 122,
-                            PermissionFieldId = 52
-                        },
-                        new
-                        {
-                            Id = 110,
-                            LicensePermissionId = 123,
-                            PermissionFieldId = 50
-                        },
-                        new
-                        {
-                            Id = 111,
-                            LicensePermissionId = 123,
-                            PermissionFieldId = 51
-                        },
-                        new
-                        {
-                            Id = 112,
-                            LicensePermissionId = 123,
-                            PermissionFieldId = 52
-                        });
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.PermissionAction", b =>
@@ -579,12 +508,6 @@ namespace CoachAssistent.Data.Migrations
                         {
                             Id = 32,
                             Name = "member",
-                            SubjectId = 2
-                        },
-                        new
-                        {
-                            Id = 33,
-                            Name = "subgroup",
                             SubjectId = 2
                         },
                         new

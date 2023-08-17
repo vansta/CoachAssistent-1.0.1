@@ -183,7 +183,7 @@ namespace CoachAssistent.Managers
                     Fields = lp.Fields.Select(f => f.PermissionField!.Name),
                     Ids = new List<Guid> { authenticationWrapper.UserId },
                     UserId = authenticationWrapper.UserId,
-                    Condition = lp.Subject!.Name == "group" ? "none" : "editors"
+                    Condition = lp.Subject!.Name == "shareable" ? "editors" : "none"
                 }).ToList();
 
             permissions.AddRange(licensePermissions);

@@ -1,4 +1,5 @@
-﻿using CoachAssistent.Models.ViewModels.Permission;
+﻿using CoachAssistent.Models.ViewModels.Exercise;
+using CoachAssistent.Models.ViewModels.Permission;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,8 +9,12 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.ViewModels.Role
 {
-    public class RoleOverviewItemViewModel
+    public class RoleOverviewItemViewModel : BaseAbilityViewModel
     {
+        public RoleOverviewItemViewModel() : base ("role")
+        {
+
+        }
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
