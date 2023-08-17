@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoachAssistent.Models.ViewModels.Member;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -18,6 +19,6 @@ namespace CoachAssistent.Models.ViewModels.User
         public DateTime CreationDate { get; set; }
 
         public Guid LicenseId { get; set; }
-        public ICollection<Guid> Memberships { get; set; } = new HashSet<Guid>();
+        public List<MembershipOverviewItemViewModel> Memberships { get; set; } = new List<MembershipOverviewItemViewModel>();
     }
 }

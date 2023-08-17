@@ -43,9 +43,20 @@ namespace CoachAssistent.Managers
         {
             User user = await dbContext.Users
                 .Include(u => u.Memberships)
+                    .ThenInclude(m => m.Group)
+                .Include(u => u.Memberships)
+                    .ThenInclude(m => m.Role)
+                .Include(u => u.MembershipRequests)
+                    .ThenInclude(m => m.Group)
                 .SingleAsync(u => u.Id == authenticationWrapper.UserId);
 
-            return mapper.Map<ProfileViewModel>(user);
+            ProfileViewModel profile = mapper.Map<ProfileViewModel>(user);
+            profile.Memberships.AddRange(user.MembershipRequests.Where(mr => !mr.ResponseTimestamp.HasValue).Select(mr => new MembershipOverviewItemViewModel
+            {
+                GroupId = mr.GroupId,
+                Group = mr.Group!.Name
+            }));
+            return profile;
         }
 
         public async Task UpdateUser(ProfileViewModel profileViewModel)
@@ -56,15 +67,18 @@ namespace CoachAssistent.Managers
 
             user.UserName = profileViewModel.UserName ?? user.UserName;
             user.Email = profileViewModel.Email;
+            user.Memberships = user.Memberships
+                .Where(m => profileViewModel.Memberships.Select(ms => ms.Id).Contains(m.Id)).ToHashSet();
 
-            foreach (var groupId in profileViewModel.Memberships.Where(g => !user.Memberships.Select(m => m.GroupId).Contains(g)))
+            foreach (var group in profileViewModel.Memberships.Where(g => !user.Memberships.Select(m => m.GroupId).Contains(g.GroupId)))
             {
                 await RequestGroupAccess(new MembershipRequestViewModel
                 {
                     UserId = authenticationWrapper.UserId,
-                    GroupId = groupId
+                    GroupId = group.GroupId
                 });
             }
+            await dbContext.SaveChangesAsync();
         }
 
         private async Task RequestGroupAccess(MembershipRequestViewModel request)

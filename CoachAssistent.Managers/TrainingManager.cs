@@ -23,16 +23,26 @@ namespace CoachAssistent.Managers
         {
 
         }
-        public OverviewViewModel<TrainingOverviewItemViewModel> GetTrainings(BaseSearchViewModel request)
+        public OverviewViewModel<TrainingOverviewItemViewModel> GetTrainings(BaseSearchViewModel search)
         {
             IQueryable<Training> trainings = dbContext.Trainings
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
                 .Include(t => t.Segments)
                 .ThenInclude(s => s.Exercises);
-            if (!string.IsNullOrEmpty(request.Search))
+            if (search is not null)
             {
-                trainings = trainings.Where(s => s.Name.Contains(request.Search));
+                if (!string.IsNullOrEmpty(search.Search))
+                {
+                    trainings = trainings
+                        .Where(e => e.Name.Contains(search.Search)
+                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
+                }
+                if (search.Tags is not null && search.Tags.Any())
+                {
+                    trainings = trainings
+                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
+                }
             }
             trainings = FilterBySharingLevel(trainings);
             return new OverviewViewModel<TrainingOverviewItemViewModel>

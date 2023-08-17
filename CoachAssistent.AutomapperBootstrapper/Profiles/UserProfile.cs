@@ -17,8 +17,7 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
                 .ForMember(dest => dest.LicenseLevel, opts => opts.MapFrom(src => src.License!.Level))
                 .ForMember(dest => dest.GroupIds, opts => opts.MapFrom(src => src.Memberships.Select(m => m.GroupId).Distinct()));
 
-            CreateMap<User, ProfileViewModel>()
-                .ForMember(dest => dest.Memberships, opts => opts.MapFrom(src => src.Memberships.Select(m => m.GroupId).Distinct()));
+            CreateMap<User, ProfileViewModel>();
         }
     }
 }
