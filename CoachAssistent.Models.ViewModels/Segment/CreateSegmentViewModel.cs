@@ -21,5 +21,6 @@ namespace CoachAssistent.Models.ViewModels.Segment
         public string? Description { get; set; }
         public ICollection<ExerciseOverviewItemViewModel> Exercises { get; set; }
         public ICollection<Guid> Editors { get; set; }
+        public ICollection<string> Tags { get; set; } = new List<string>();
     }
 }

@@ -54,7 +54,12 @@ namespace CoachAssistent.Managers
 
         public async Task<ExerciseOverviewItemViewModel> GetExercise(Guid id)
         {
-            Exercise? exercise = await dbContext.Exercises.FindAsync(id);
+            Exercise? exercise = await dbContext.Exercises
+                .Include(e => e.Attachments)
+                .Include(e => e.Tags)
+                .Include(e => e.Shareable!.ShareablesXGroups)
+                .Include(e => e.Shareable!.Editors)
+                .SingleAsync(e => e.Id == id);
             return mapper.Map<ExerciseOverviewItemViewModel>(exercise);
         }
 

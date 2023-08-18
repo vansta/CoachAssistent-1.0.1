@@ -19,5 +19,6 @@ namespace CoachAssistent.Models.ViewModels.Training
         public string? Description { get; set; }
         public ICollection<SegmentOverviewItemViewModel> Segments { get; set; }
         public ICollection<Guid> Editors { get; set; } = new HashSet<Guid>();
+        public ICollection<string> Tags { get; set; } = new HashSet<string>();
     }
 }

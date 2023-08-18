@@ -15,6 +15,7 @@ namespace CoachAssistent.Models.ViewModels.Training
         public string? Description { get; set; }
 
         public ICollection<SegmentOverviewItemViewModel> Segments { get; set; }
+        public ICollection<string>? Tags { get; set; }
 
         public TrainingOverviewItemViewModel()
         {

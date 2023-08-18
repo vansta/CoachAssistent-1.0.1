@@ -143,16 +143,26 @@ namespace CoachAssistent.Managers
             {
                 if (response.Response)
                 {
+                    Guid roleId = response.RoleId ?? dbContext.Roles.OrderBy(r => r.Index).First().Id;
                     Member member = new()
                     {
                         GroupId = membershipRequest.GroupId,
                         UserId = membershipRequest.UserId,
-                        RoleId = response.RoleId!.Value
+                        RoleId = roleId
                     };
                     await dbContext.Members.AddAsync(member);
                 }
                 membershipRequest.ResponseTimestamp = DateTime.Now;
                 await dbContext.SaveChangesAsync();           }
+        }
+
+        public Task RequestMembership(Guid groupId)
+        {
+            return RequestGroupAccess(new MembershipRequestViewModel
+            {
+                GroupId = groupId,
+                UserId = authenticationWrapper.UserId
+            });
         }
     }
 }

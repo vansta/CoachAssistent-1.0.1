@@ -25,7 +25,8 @@ namespace CoachAssistent.Managers
                 .Include(s => s.SegmentsXExercises.OrderBy(se => se.Index))
                     .ThenInclude(se => se.Exercise)
                 .Include(s => s.Shareable!.ShareablesXGroups)
-                .Include(s => s.Shareable!.Editors);
+                .Include(s => s.Shareable!.Editors)
+                .Include(s => s.Tags);
             if (search is not null)
             {
                 if (!string.IsNullOrEmpty(search.Search))
@@ -53,6 +54,7 @@ namespace CoachAssistent.Managers
         public async Task<SegmentViewModel> GetSegment(Guid id)
         {
             Segment? segment = await dbContext.Segments
+                .Include(s => s.Tags)
                 .Include(s => s.Exercises)
                     .ThenInclude(e => e.Attachments)
                 .Include(s => s.SegmentsXExercises.OrderBy(se => se.Index))
@@ -73,6 +75,7 @@ namespace CoachAssistent.Managers
                 Name = viewModel.Name,
                 Description = viewModel.Description,
                 Exercises = exercises.ToHashSet(),
+                Tags = CondenseTags(viewModel.Tags),
                 Shareable = new Shareable
                 {
                     SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel),
@@ -90,7 +93,7 @@ namespace CoachAssistent.Managers
         public async Task Update(SegmentViewModel viewModel)
         {
             Segment segment = await dbContext.Segments
-                //.Include(s => s.Exercises)
+                .Include(s => s.Tags)
                 .Include(s => s.SegmentsXExercises)
                 .Include(s => s.Shareable!.Editors)
                 .Include(s => s.Shareable!.ShareablesXGroups)
@@ -98,7 +101,7 @@ namespace CoachAssistent.Managers
 
             segment.Name = viewModel.Name;
             segment.Description = viewModel.Description;
-
+            segment.Tags = CondenseTags(viewModel.Tags);
             await AddHistoryLog(segment.ShareableId, EditActionType.Edit);
 
             int exerciseIndex = 0;

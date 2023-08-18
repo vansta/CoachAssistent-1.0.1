@@ -28,6 +28,7 @@ namespace CoachAssistent.Managers
             IQueryable<Training> trainings = dbContext.Trainings
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
+                .Include(t => t.Tags)
                 .Include(t => t.Segments)
                 .ThenInclude(s => s.Exercises);
             if (search is not null)
@@ -58,6 +59,7 @@ namespace CoachAssistent.Managers
             Training? training = await dbContext.Trainings
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
+                .Include(t => t.Tags!)
                 .Include(t => t.Segments!)
                     .ThenInclude(s => s.Shareable)
                 .Include(t => t.Segments!)
@@ -73,6 +75,7 @@ namespace CoachAssistent.Managers
             {
                 Name = viewModel.Name,
                 Description = viewModel.Description,
+                Tags = CondenseTags(viewModel.Tags),
                 Shareable = new Shareable
                 {
                     SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel),
@@ -94,12 +97,14 @@ namespace CoachAssistent.Managers
             Training training = await dbContext.Trainings
                 .Include(t => t.Shareable!.Editors)
                 .Include(t => t.Shareable!.ShareablesXGroups)
+                .Include(t => t.Tags)
                 .Include(t => t.Segments)
                     .ThenInclude(s => s.Exercises)
                 .SingleAsync(s => s.Id.Equals(viewModel.Id));
 
             training.Name = viewModel.Name;
             training.Description = viewModel.Description;
+            training.Tags = CondenseTags(viewModel.Tags);
 
             training.Shareable!.SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel);
             training.Shareable.Editors = CondenseEditors(viewModel.Editors, training.Shareable);

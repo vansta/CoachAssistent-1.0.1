@@ -80,24 +80,5 @@ namespace CoachAssistent.Managers
             }
             await dbContext.SaveChangesAsync();
         }
-
-        private async Task RequestGroupAccess(MembershipRequestViewModel request)
-        {
-            MembershipRequest? membershipRequest = dbContext.MembershipRequests
-                .FirstOrDefault(mr => mr.UserId.Equals(request.UserId) && mr.GroupId.Equals(request.GroupId) && !mr.ResponseTimestamp.HasValue);
-
-            if (membershipRequest is null)
-            {
-                membershipRequest = new MembershipRequest
-                {
-                    UserId = request.UserId,
-                    GroupId = request.GroupId,
-                    Description = request.Description,
-                    RequestTimestamp = DateTime.Now
-                };
-                await dbContext.MembershipRequests.AddAsync(membershipRequest);
-            }
-            await dbContext.SaveChangesAsync();
-        }
     }
 }

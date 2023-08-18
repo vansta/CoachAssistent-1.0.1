@@ -51,6 +51,13 @@ namespace CoachAssistent.Api.Controllers
             return groupManager.CreateGroup(createGroupViewModel);
         }
 
+
+        [HttpPost("RequestMembership")]
+        public Task RequestMembership([FromBody]Guid groupId)
+        {
+            return groupManager.RequestMembership(groupId);
+        }
+
         [HttpPut]
         public async Task UpdateGroup(EditGroupViewModel editGroupViewModel)
         {

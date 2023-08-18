@@ -13,5 +13,6 @@ namespace CoachAssistent.Models.ViewModels.Segment
         public string? Name { get; set; }
         public string? Description { get; set; }
         public ICollection<string>? Exercises { get; set; }
+        public ICollection<string>? Tags { get; set; }
     }
 }

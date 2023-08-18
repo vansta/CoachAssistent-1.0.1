@@ -2,6 +2,7 @@
 using CoachAssistent.Data;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
+using CoachAssistent.Models.ViewModels.Member;
 using CoachAssistent.Models.ViewModels.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,12 +20,10 @@ namespace CoachAssistent.Managers
 {
     public class AccountManager : BaseManager
     {
-        //readonly IConfiguration configuration;
         readonly JwtHelper jwtHelper;
         const int iterations = 32;
         const int saltSize = 20;
         readonly HashAlgorithmName hashAlgorithmName = HashAlgorithmName.SHA256;
-
         public AccountManager(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration) : base(dbContext, mapper)
         {
             //this.configuration = configuration;
@@ -70,6 +69,19 @@ namespace CoachAssistent.Managers
             }
 
             user = (await dbContext.Users.AddAsync(user)).Entity;
+
+            if (registerData.GroupIds is not null)
+            {
+                foreach (var group in registerData.GroupIds.Where(g => !user.Memberships.Select(m => m.GroupId).Contains(g)))
+                {
+                    await RequestGroupAccess(new MembershipRequestViewModel
+                    {
+                        UserId = user.Id,
+                        GroupId = group
+                    });
+                }
+            }
+            
             await dbContext.SaveChangesAsync();
 
             return mapper.Map<LoggedInUserViewModel>(user);
@@ -95,7 +107,6 @@ namespace CoachAssistent.Managers
             {
                 throw new Exception("Incorrect password");
             }
-            
         }
     }
 }

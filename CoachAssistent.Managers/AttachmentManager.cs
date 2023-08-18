@@ -49,6 +49,7 @@ namespace CoachAssistent.Managers
 
         internal static void CopyAttachment(string fromPath, string toPath, Attachment attachment)
         {
+            Directory.CreateDirectory(toPath);
             File.Copy(Path.Combine(fromPath, attachment.FilePath), Path.Combine(toPath, attachment.FilePath));
         }
 
