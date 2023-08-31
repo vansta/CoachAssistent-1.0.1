@@ -8,10 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 JwtHelper jwtHelper = new(builder.Configuration);
 
-
 // Add services to the container.
-builder.Services.AddCors(options => options.AddDefaultPolicy(cfg => cfg.WithOrigins("https://witty-stone-0d73d6903.3.azurestaticapps.net/").AllowAnyMethod().AllowAnyHeader()));
-//var config = new AutoMapper.MapperConfiguration(cfg => cfg.AddProfiles(MapperService.Profiles));
+builder.Services.AddCors(options => options.AddDefaultPolicy(cfg => cfg.WithOrigins(builder.Configuration.GetValue<string>("AllowedOrigins") ?? string.Empty).AllowAnyMethod().AllowAnyHeader()));
 builder.Services.AddAutoMapper(typeof(ExerciseProfile));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
