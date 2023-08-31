@@ -10,13 +10,13 @@ JwtHelper jwtHelper = new(builder.Configuration);
 
 
 // Add services to the container.
-builder.Services.AddCors(options => options.AddDefaultPolicy(cfg => cfg.WithOrigins("http://127.0.0.1:5173").AllowAnyMethod().AllowAnyHeader()));
+builder.Services.AddCors(options => options.AddDefaultPolicy(cfg => cfg.WithOrigins("https://witty-stone-0d73d6903.3.azurestaticapps.net/").AllowAnyMethod().AllowAnyHeader()));
 //var config = new AutoMapper.MapperConfiguration(cfg => cfg.AddProfiles(MapperService.Profiles));
 builder.Services.AddAutoMapper(typeof(ExerciseProfile));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<CoachAssistent.Data.CoachAssistentDbContext>(
     options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
@@ -34,11 +34,11 @@ builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 app.UseCors();
 app.UseHttpsRedirection();
 
