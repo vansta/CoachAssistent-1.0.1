@@ -80,7 +80,7 @@ namespace CoachAssistent.Data
                 .Entity<RolePermissionXPermissionField>()
                 .HasOne(se => se.RolePermission)
                 .WithMany(s => s.Fields)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder
                 .Entity<RolePermissionXPermissionField>()
@@ -140,24 +140,7 @@ namespace CoachAssistent.Data
                     Description = "A reader can read",
                     Index = 3,
                     MinimalLicenseLevel = 1
-                }
-                //new Role
-                //{
-                //    Id = editorId,
-                //    Name = "Editor",
-                //    Description = "An editor owns an exercise, segment or training",
-                //    Index = 99,
-                //    MinimalLicenseLevel = 99
-                //},
-                //new Role
-                //{
-                //    Id = defaultId,
-                //    Name = "Default user",
-                //    Description = "A default role, allowing basic functionality",
-                //    Index = 10,
-                //    MinimalLicenseLevel = 99
-                //}
-                );
+                });
             modelBuilder.Entity<PermissionAction>()
                 .HasData(new PermissionAction
                 {
@@ -193,6 +176,11 @@ namespace CoachAssistent.Data
                 {
                     Id = 3,
                     Name = "role"
+                },
+                new PermissionSubject
+                {
+                    Id = 4,
+                    Name = "license"
                 });
 
             List<PermissionField> permissionFields = new List<PermissionField>
@@ -268,6 +256,26 @@ namespace CoachAssistent.Data
                     Id = 52,
                     Name = "permissions",
                     SubjectId = 3
+                },
+                //license
+                new PermissionField
+                {
+                    Id = 60,
+                    Name = "name",
+                    Description = "Name",
+                    SubjectId = 4
+                },
+                new PermissionField
+                {
+                    Id = 61,
+                    Name = "description",
+                    SubjectId = 4
+                },
+                new PermissionField
+                {
+                    Id = 62,
+                    Name = "permissions",
+                    SubjectId = 4
                 }
             };
 
@@ -363,7 +371,7 @@ namespace CoachAssistent.Data
                     ActionId = 1,
                     SubjectId = 2
                 },
-
+                //for admin
                 new LicensePermission
                 {
                     Id = 101,
@@ -419,6 +427,34 @@ namespace CoachAssistent.Data
                     LicenseId = adminLicenseId,
                     ActionId = 4,
                     SubjectId = 3
+                },
+                new LicensePermission
+                {
+                    Id = 220,
+                    LicenseId = adminLicenseId,
+                    ActionId = 1,
+                    SubjectId = 4
+                },
+                new LicensePermission
+                {
+                    Id = 221,
+                    LicenseId = adminLicenseId,
+                    ActionId = 2,
+                    SubjectId = 4
+                },
+                new LicensePermission
+                {
+                    Id = 222,
+                    LicenseId = adminLicenseId,
+                    ActionId = 3,
+                    SubjectId = 4
+                },
+                new LicensePermission
+                {
+                    Id = 223,
+                    LicenseId = adminLicenseId,
+                    ActionId = 4,
+                    SubjectId = 4
                 });
 
             modelBuilder.Entity<LicensePermissionXPermissionField>()
@@ -493,6 +529,12 @@ namespace CoachAssistent.Data
                     Id = 112,
                     LicensePermissionId = 123,
                     PermissionFieldId = 52
+                },
+                new LicensePermissionXPermissionField
+                {
+                    Id = 200,
+                    LicensePermissionId = 222,
+                    PermissionFieldId = 62
                 });
         }
     }
