@@ -26,23 +26,10 @@ namespace CoachAssistent.Managers
                 .Include(e => e.Attachments)
                 .Include(e => e.Tags)
                 .Include(e => e.Shareable!.ShareablesXGroups)
-                .Include(e => e.Shareable!.Editors);
+                .Include(e => e.Shareable!.Editors)
+                .Include(e => e.Shareable!.Favorites.Where(f => f.UserId == authenticationWrapper.UserId));
 
-            if (search is not null)
-            {
-                if (!string.IsNullOrEmpty(search.Search))
-                {
-                    exercises = exercises
-                        .Where(e => e.Name.Contains(search.Search)
-                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
-                }
-                if (search.Tags is not null && search.Tags.Any())
-                {
-                    exercises = exercises
-                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
-                }
-            }
-
+            exercises = FilterShareables(exercises, search);
             exercises = FilterBySharingLevel(exercises);
 
             return new OverviewViewModel<ExerciseOverviewItemViewModel>

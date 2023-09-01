@@ -1,4 +1,4 @@
-﻿dotnet ef migrations add <MigrationName> --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\
+﻿dotnet ef migrations add Favorites --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\
 
 dotnet ef migrations remove --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\
 

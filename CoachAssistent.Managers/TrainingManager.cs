@@ -28,23 +28,12 @@ namespace CoachAssistent.Managers
             IQueryable<Training> trainings = dbContext.Trainings
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
+                .Include(e => e.Shareable!.Favorites.Where(f => f.UserId == authenticationWrapper.UserId))
                 .Include(t => t.Tags)
                 .Include(t => t.Segments)
                 .ThenInclude(s => s.Exercises);
-            if (search is not null)
-            {
-                if (!string.IsNullOrEmpty(search.Search))
-                {
-                    trainings = trainings
-                        .Where(e => e.Name.Contains(search.Search)
-                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
-                }
-                if (search.Tags is not null && search.Tags.Any())
-                {
-                    trainings = trainings
-                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
-                }
-            }
+
+            trainings = FilterShareables(trainings, search);
             trainings = FilterBySharingLevel(trainings);
             return new OverviewViewModel<TrainingOverviewItemViewModel>
             {

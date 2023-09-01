@@ -13,6 +13,7 @@ namespace CoachAssistent.Models.Domain
 
             Memberships = new HashSet<Member>();
             MembershipRequests = new HashSet<MembershipRequest>();
+            Favorites = new HashSet<Favorite>();
         }
         public Guid Id { get; set; }
         [MaxLength(64)]
@@ -34,5 +35,6 @@ namespace CoachAssistent.Models.Domain
         public License? License { get; set; }
         public ICollection<Member> Memberships { get; set; }
         public ICollection<MembershipRequest> MembershipRequests { get; set; }
+        public ICollection<Favorite> Favorites { get; set; }
     }
 }
