@@ -72,7 +72,7 @@ namespace CoachAssistent.Managers
                     ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
                 },
                 Segments = dbContext
-                    .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet()
+                    .Segments.Where(s => viewModel.Segments.Contains(s.Id)).ToHashSet()
             };
             training = (await dbContext.Trainings.AddAsync(training)).Entity;
             await dbContext.SaveChangesAsync();
@@ -102,12 +102,12 @@ namespace CoachAssistent.Managers
             training.TrainingsXSegments = viewModel.Segments
                 .Select(t =>
                 {
-                    TrainingXSegment? trainingXSegment = training.TrainingsXSegments.FirstOrDefault(ts => ts.SegmentId.Equals(t.Id));
+                    TrainingXSegment? trainingXSegment = training.TrainingsXSegments.FirstOrDefault(ts => ts.SegmentId.Equals(t));
                     if (trainingXSegment is null)
                     {
                         return new TrainingXSegment
                         {
-                            SegmentId = t.Id,
+                            SegmentId = t,
                             Index = segmentIndex
                         };
                     }

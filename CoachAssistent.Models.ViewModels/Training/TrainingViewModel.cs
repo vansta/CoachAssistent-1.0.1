@@ -10,14 +10,14 @@ namespace CoachAssistent.Models.ViewModels.Training
 {
     public class TrainingViewModel : BaseShareableViewModel
     {
-        public TrainingViewModel()
-        {
-            Segments = new HashSet<SegmentOverviewItemViewModel>();
-        }
+        //public TrainingViewModel()
+        //{
+        //    Segments = new HashSet<SegmentOverviewItemViewModel>();
+        //}
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public ICollection<SegmentOverviewItemViewModel> Segments { get; set; }
+        public ICollection<Guid> Segments { get; set; } = new HashSet<Guid>();
         public ICollection<Guid> Editors { get; set; } = new HashSet<Guid>();
         public ICollection<string> Tags { get; set; } = new HashSet<string>();
     }
