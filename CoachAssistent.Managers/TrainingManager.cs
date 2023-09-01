@@ -30,8 +30,10 @@ namespace CoachAssistent.Managers
                 .Include(t => t.Shareable!.Editors)
                 .Include(e => e.Shareable!.Favorites.Where(f => f.UserId == authenticationWrapper.UserId))
                 .Include(t => t.Tags)
-                .Include(t => t.Segments)
-                .ThenInclude(s => s.Exercises);
+                .Include(t => t.TrainingsXSegments.OrderBy(ts => ts.Index))
+                    .ThenInclude(ts => ts.Segment)
+                    .ThenInclude(s => s!.SegmentsXExercises.OrderBy(se => se.Index))
+                    .ThenInclude(se => se.Exercise);
 
             trainings = FilterShareables(trainings, search);
             trainings = FilterBySharingLevel(trainings);
@@ -49,11 +51,8 @@ namespace CoachAssistent.Managers
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
                 .Include(t => t.Tags!)
-                .Include(t => t.Segments!)
-                    .ThenInclude(s => s.Shareable)
-                .Include(t => t.Segments!)
-                    .ThenInclude(s => s.Exercises)
-                    .ThenInclude(e => e.Attachments)
+                .Include(t => t.TrainingsXSegments.OrderBy(ts => ts.Index))
+                    .ThenInclude(ts => ts.Segment)
                 .SingleAsync(s => s.Id.Equals(id));
             return mapper.Map<TrainingViewModel>(training);
         }
@@ -99,8 +98,28 @@ namespace CoachAssistent.Managers
             training.Shareable.Editors = CondenseEditors(viewModel.Editors, training.Shareable);
             training.Shareable.ShareablesXGroups = CondenseGroups(viewModel.GroupIds, training.Shareable);
 
-            training.Segments = dbContext
-                .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
+            int segmentIndex = 0;
+            training.TrainingsXSegments = viewModel.Segments
+                .Select(t =>
+                {
+                    TrainingXSegment? trainingXSegment = training.TrainingsXSegments.FirstOrDefault(ts => ts.SegmentId.Equals(t.Id));
+                    if (trainingXSegment is null)
+                    {
+                        return new TrainingXSegment
+                        {
+                            SegmentId = t.Id,
+                            Index = segmentIndex
+                        };
+                    }
+                    else
+                    {
+                        trainingXSegment.Index = segmentIndex;
+                    }
+                    segmentIndex++;
+                    return trainingXSegment;
+                }).ToList();
+            //training.Segments = dbContext
+            //    .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
 
             await AddHistoryLog(training.ShareableId, EditActionType.Edit);
 
