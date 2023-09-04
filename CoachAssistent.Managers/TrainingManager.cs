@@ -37,11 +37,13 @@ namespace CoachAssistent.Managers
 
             trainings = FilterShareables(trainings, search);
             trainings = FilterBySharingLevel(trainings);
+
+            int totalCount = trainings.Count();
             return new OverviewViewModel<TrainingOverviewItemViewModel>
             {
-                Items = trainings
+                Items = PaginateShareables(trainings, search)
                     .Select(s => mapper.Map<TrainingOverviewItemViewModel>(s)),
-                TotalCount = trainings.Count()
+                TotalCount = totalCount
             };
         }
 

@@ -20,9 +20,10 @@ namespace CoachAssistent.Api.Controllers
 
         [Authorize]
         [HttpGet("CheckToken")]
-        public string CheckToken()
+        public IActionResult CheckToken()
         {
-            return "Ok";
+            //return Unauthorized();
+            return Ok("Ok");
         }
 
         [HttpPost]

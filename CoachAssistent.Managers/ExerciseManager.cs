@@ -32,10 +32,12 @@ namespace CoachAssistent.Managers
             exercises = FilterShareables(exercises, search);
             exercises = FilterBySharingLevel(exercises);
 
+            int totalCount = exercises.Count();
             return new OverviewViewModel<ExerciseOverviewItemViewModel>
             {
-                Items = exercises.Select(e => mapper.Map<ExerciseOverviewItemViewModel>(e)),
-                TotalCount = exercises.Count()
+                Items = PaginateShareables(exercises, search)
+                    .Select(e => mapper.Map<ExerciseOverviewItemViewModel>(e)),
+                TotalCount = totalCount
             };
         }
 
@@ -91,7 +93,7 @@ namespace CoachAssistent.Managers
                 .Include(e => e.Shareable!.Editors)
                 .SingleAsync(e => e.Id.Equals(exerciseId));
 
-            Exercise copy = new Exercise
+            Exercise copy = new()
             {
                 Name = exercise.Name,
                 Description = exercise.Description,

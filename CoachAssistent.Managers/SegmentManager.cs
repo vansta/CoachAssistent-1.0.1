@@ -30,11 +30,13 @@ namespace CoachAssistent.Managers
                 .Include(s => s.Tags);
             segments = FilterShareables(segments, search);
             segments = FilterBySharingLevel(segments);
+
+            int totalCount = segments.Count();
             return new OverviewViewModel<SegmentOverviewItemViewModel>
             {
-                Items = segments
+                Items = PaginateShareables(segments, search)
                     .Select(s => mapper.Map<SegmentOverviewItemViewModel>(s)),
-                TotalCount = segments.Count()
+                TotalCount = totalCount
             };
         }
 

@@ -73,6 +73,16 @@ namespace CoachAssistent.Managers
             }
             return collection;
         }
+        public IQueryable<T> PaginateShareables<T>(IQueryable<T> collection, BaseSearchViewModel search) where T : IShareable
+        {
+            if (!search.ShowAll)
+            {
+                collection = collection
+                    .Skip(search.Skip)
+                    .Take(search.ItemsPerPage);
+            }
+            return collection;
+        }
         public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : IShareable
         {
             collection = collection
