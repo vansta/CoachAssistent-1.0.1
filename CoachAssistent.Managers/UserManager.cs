@@ -20,11 +20,9 @@ namespace CoachAssistent.Managers
 {
     public class UserManager : BaseAuthenticatedManager
     {
-        //readonly IConfiguration configuration;
         public UserManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
             : base(context, mapper, configuration, authenticationWrapper)
         {
-            //this.configuration = configuration;
         }
 
         public IEnumerable<Guid> GetAssignedEditors(Guid id)

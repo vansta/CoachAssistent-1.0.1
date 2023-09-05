@@ -25,28 +25,47 @@ namespace CoachAssistent.Managers
             this._configuration = configuration;
         }
 
-        public bool Can(IShareable shareable, string action, string field)
+        public void Can(string action, string subject)
         {
             IEnumerable<RolePermissionViewModel> rolePermissions = GetPermissions();
-            return rolePermissions.Any(rp =>
-                rp.Subject!.Equals("shareable")
-                && rp.Action!.Equals(action)
-                && rp.Fields.Contains(field)
-                && (
-                    shareable.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId)
-                    || shareable.Shareable.ShareablesXGroups.Select(sg => sg.GroupId).Contains(rp.Ids!.First())
-                )
-                );
+            bool can = rolePermissions.Any(rp =>
+                rp.Subject!.Equals(subject)
+                && rp.Action!.Equals(action));
+            if (!can)
+            {
+                throw new UnauthorizedAccessException();
+            }
         }
 
-        public bool Can(Group group, string action, string field)
+        public void Can(string action, IShareable shareable, string? field = null)
         {
             IEnumerable<RolePermissionViewModel> rolePermissions = GetPermissions();
-            return rolePermissions.Any(rp =>
+            bool can = rolePermissions.Any(rp =>
+                rp.Subject!.Equals("shareable")
+                && rp.Action!.Equals(action)
+                && (string.IsNullOrEmpty(field) || rp.Fields.Contains(field))
+                && (rp.Condition != "groupIds" || rp.Ids == null || rp.Ids.Any(i => authenticationWrapper.User.GroupIds.Contains(i)) )
+                && (rp.Condition != "editors" || shareable.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId))
+                );
+            if (!can)
+            {
+                throw new UnauthorizedAccessException();
+            }
+        }
+
+        public void Can(string action, Group group, string? field = null)
+        {
+            IEnumerable<RolePermissionViewModel> rolePermissions = GetPermissions();
+            bool can = rolePermissions.Any(rp =>
                                             rp.Subject!.Equals("group")
                                             && rp.Action!.Equals(action)
-                                            && rp.Fields.Contains(field)
+                                            && (string.IsNullOrEmpty(field) || rp.Fields.Contains(field))
                                             && rp.Ids!.Contains(group.Id));
+
+            if (!can)
+            {
+                throw new UnauthorizedAccessException();
+            }
         }
 
         public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : IShareable

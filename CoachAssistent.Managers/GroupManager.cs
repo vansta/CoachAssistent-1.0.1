@@ -47,6 +47,7 @@ namespace CoachAssistent.Managers
                 SubGroups = dbContext.Groups.Where(g => createGroupViewModel.SubGroups.Select(sg => sg.Id).Contains(g.Id)).ToHashSet()
         };
 
+            Can("create", group);
             var addGroup = await dbContext.Groups.AddAsync(group);
             await dbContext.SaveChangesAsync();
 
@@ -87,6 +88,7 @@ namespace CoachAssistent.Managers
                 .Include(g => g.SubGroups)
                 .SingleAsync(g => g.Id.Equals(editGroupViewModel.Id));
 
+            Can("update", group);
             group.Name = editGroupViewModel.Name ?? "New group";
             group.Description = editGroupViewModel.Description;
             group.Tags = CondenseTags(editGroupViewModel.Tags);
@@ -138,9 +140,12 @@ namespace CoachAssistent.Managers
 
         public async Task RespondToMembershipRequest(MembershipRequestResponseViewModel response)
         {
-            MembershipRequest? membershipRequest = await dbContext.MembershipRequests.FindAsync(response.Id);
+            MembershipRequest? membershipRequest = await dbContext.MembershipRequests
+                .Include(mr => mr.Group)
+                .FirstOrDefaultAsync(mr => mr.Id == response.Id);
             if (membershipRequest is not null)
             {
+                Can("update", membershipRequest.Group!);
                 if (response.Response)
                 {
                     Guid roleId = response.RoleId ?? dbContext.Roles.OrderBy(r => r.Index).First().Id;

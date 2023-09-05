@@ -143,6 +143,8 @@ namespace CoachAssistent.Managers
                 .Include(e => e.Shareable!.ShareablesXGroups)
                 .SingleAsync(e => e.Id.Equals(viewModel.Id));
 
+            Can("update", exercise);
+
             exercise.Name = viewModel.Name;
             exercise.Description = viewModel.Description;
             exercise.Tags = CondenseTags(viewModel.Tags);
@@ -178,12 +180,15 @@ namespace CoachAssistent.Managers
 
         public async Task Delete(Guid id)
         {
+
             Exercise? exercise = await dbContext.Exercises
                 .Include(e => e.Attachments)
                 .SingleOrDefaultAsync(e => e.Id.Equals(id));
-
+            
             if (exercise is not null)
             {
+                Can("delete", exercise);
+
                 exercise.DeletedTS = DateTime.Now;
                 await AddHistoryLog(exercise.ShareableId, EditActionType.Delete);
                 await dbContext.SaveChangesAsync();

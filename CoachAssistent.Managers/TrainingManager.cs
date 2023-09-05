@@ -86,6 +86,8 @@ namespace CoachAssistent.Managers
                 Segments = dbContext
                     .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet()
             };
+
+            Can("create", training);
             training = (await dbContext.Trainings.AddAsync(training)).Entity;
             await dbContext.SaveChangesAsync();
 
@@ -102,6 +104,7 @@ namespace CoachAssistent.Managers
                     .ThenInclude(s => s.Exercises)
                 .SingleAsync(s => s.Id.Equals(viewModel.Id));
 
+            Can("update", training);
             training.Name = viewModel.Name;
             training.Description = viewModel.Description;
             training.Tags = CondenseTags(viewModel.Tags);
@@ -123,6 +126,7 @@ namespace CoachAssistent.Managers
             Training? training = await dbContext.Trainings.FindAsync(id);
             if (training is not null)
             {
+                Can("delete", training);
                 await AddHistoryLog(training.ShareableId, EditActionType.Edit);
                 training.DeletedTS = DateTime.Now;
                 await dbContext.SaveChangesAsync();
