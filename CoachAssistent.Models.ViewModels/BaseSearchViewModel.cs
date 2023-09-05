@@ -9,7 +9,13 @@ namespace CoachAssistent.Models.ViewModels
 {
     public class BaseSearchViewModel
     {
+        public bool? OnlyFavorites { get; set; }
         public string? Search { get; set; }
         public IList<string?>? Tags { get; set; }
+        public int CurrentPage { get; set; }
+        public int ItemsPerPage { get; set; }
+
+        public bool ShowAll { get { return ItemsPerPage <= 0; } }
+        public int Skip { get { return (CurrentPage - 1) * ItemsPerPage; } }
     }
 }

@@ -26,28 +26,17 @@ namespace CoachAssistent.Managers
                     .ThenInclude(se => se.Exercise)
                 .Include(s => s.Shareable!.ShareablesXGroups)
                 .Include(s => s.Shareable!.Editors)
+                .Include(e => e.Shareable!.Favorites.Where(f => f.UserId == authenticationWrapper.UserId))
                 .Include(s => s.Tags);
-            if (search is not null)
-            {
-                if (!string.IsNullOrEmpty(search.Search))
-                {
-                    segments = segments
-                        .Where(e => e.Name.Contains(search.Search)
-                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
-                }
-                if (search.Tags is not null && search.Tags.Any())
-                {
-                    segments = segments
-                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
-                }
-            }
-
+            segments = FilterShareables(segments, search);
             segments = FilterBySharingLevel(segments);
+
+            int totalCount = segments.Count();
             return new OverviewViewModel<SegmentOverviewItemViewModel>
             {
-                Items = segments
+                Items = PaginateShareables(segments, search)
                     .Select(s => mapper.Map<SegmentOverviewItemViewModel>(s)),
-                TotalCount = segments.Count()
+                TotalCount = totalCount
             };
         }
 

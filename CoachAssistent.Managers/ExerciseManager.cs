@@ -26,29 +26,18 @@ namespace CoachAssistent.Managers
                 .Include(e => e.Attachments)
                 .Include(e => e.Tags)
                 .Include(e => e.Shareable!.ShareablesXGroups)
-                .Include(e => e.Shareable!.Editors);
+                .Include(e => e.Shareable!.Editors)
+                .Include(e => e.Shareable!.Favorites.Where(f => f.UserId == authenticationWrapper.UserId));
 
-            if (search is not null)
-            {
-                if (!string.IsNullOrEmpty(search.Search))
-                {
-                    exercises = exercises
-                        .Where(e => e.Name.Contains(search.Search)
-                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
-                }
-                if (search.Tags is not null && search.Tags.Any())
-                {
-                    exercises = exercises
-                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
-                }
-            }
-
+            exercises = FilterShareables(exercises, search);
             exercises = FilterBySharingLevel(exercises);
 
+            int totalCount = exercises.Count();
             return new OverviewViewModel<ExerciseOverviewItemViewModel>
             {
-                Items = exercises.Select(e => mapper.Map<ExerciseOverviewItemViewModel>(e)),
-                TotalCount = exercises.Count()
+                Items = PaginateShareables(exercises, search)
+                    .Select(e => mapper.Map<ExerciseOverviewItemViewModel>(e)),
+                TotalCount = totalCount
             };
         }
 
@@ -104,7 +93,7 @@ namespace CoachAssistent.Managers
                 .Include(e => e.Shareable!.Editors)
                 .SingleAsync(e => e.Id.Equals(exerciseId));
 
-            Exercise copy = new Exercise
+            Exercise copy = new()
             {
                 Name = exercise.Name,
                 Description = exercise.Description,

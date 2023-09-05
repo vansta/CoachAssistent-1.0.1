@@ -15,5 +15,6 @@ namespace CoachAssistent.Models.Domain
         public ICollection<Editor> Editors { get; set; } = new HashSet<Editor>();
         public ICollection<HistoryLog> HistoryLogs { get; set; } = new HashSet<HistoryLog>();
         public ICollection<HistoryLog> Copies { get; set; } = new HashSet<HistoryLog>();
+        public ICollection<Favorite> Favorites { get; set; } = new HashSet<Favorite>();
     }
 }

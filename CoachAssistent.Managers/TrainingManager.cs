@@ -28,29 +28,22 @@ namespace CoachAssistent.Managers
             IQueryable<Training> trainings = dbContext.Trainings
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
+                .Include(e => e.Shareable!.Favorites.Where(f => f.UserId == authenticationWrapper.UserId))
                 .Include(t => t.Tags)
-                .Include(t => t.Segments)
-                .ThenInclude(s => s.Exercises);
-            if (search is not null)
-            {
-                if (!string.IsNullOrEmpty(search.Search))
-                {
-                    trainings = trainings
-                        .Where(e => e.Name.Contains(search.Search)
-                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
-                }
-                if (search.Tags is not null && search.Tags.Any())
-                {
-                    trainings = trainings
-                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
-                }
-            }
+                .Include(t => t.TrainingsXSegments.OrderBy(ts => ts.Index))
+                    .ThenInclude(ts => ts.Segment)
+                    .ThenInclude(s => s!.SegmentsXExercises.OrderBy(se => se.Index))
+                    .ThenInclude(se => se.Exercise);
+
+            trainings = FilterShareables(trainings, search);
             trainings = FilterBySharingLevel(trainings);
+
+            int totalCount = trainings.Count();
             return new OverviewViewModel<TrainingOverviewItemViewModel>
             {
-                Items = trainings
+                Items = PaginateShareables(trainings, search)
                     .Select(s => mapper.Map<TrainingOverviewItemViewModel>(s)),
-                TotalCount = trainings.Count()
+                TotalCount = totalCount
             };
         }
 
@@ -60,11 +53,8 @@ namespace CoachAssistent.Managers
                 .Include(t => t.Shareable!.ShareablesXGroups)
                 .Include(t => t.Shareable!.Editors)
                 .Include(t => t.Tags!)
-                .Include(t => t.Segments!)
-                    .ThenInclude(s => s.Shareable)
-                .Include(t => t.Segments!)
-                    .ThenInclude(s => s.Exercises)
-                    .ThenInclude(e => e.Attachments)
+                .Include(t => t.TrainingsXSegments.OrderBy(ts => ts.Index))
+                    .ThenInclude(ts => ts.Segment)
                 .SingleAsync(s => s.Id.Equals(id));
             return mapper.Map<TrainingViewModel>(training);
         }
@@ -84,7 +74,7 @@ namespace CoachAssistent.Managers
                     ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
                 },
                 Segments = dbContext
-                    .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet()
+                    .Segments.Where(s => viewModel.Segments.Contains(s.Id)).ToHashSet()
             };
 
             Can("create", training);
@@ -113,8 +103,28 @@ namespace CoachAssistent.Managers
             training.Shareable.Editors = CondenseEditors(viewModel.Editors, training.Shareable);
             training.Shareable.ShareablesXGroups = CondenseGroups(viewModel.GroupIds, training.Shareable);
 
-            training.Segments = dbContext
-                .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
+            int segmentIndex = 0;
+            training.TrainingsXSegments = viewModel.Segments
+                .Select(t =>
+                {
+                    TrainingXSegment? trainingXSegment = training.TrainingsXSegments.FirstOrDefault(ts => ts.SegmentId.Equals(t));
+                    if (trainingXSegment is null)
+                    {
+                        return new TrainingXSegment
+                        {
+                            SegmentId = t,
+                            Index = segmentIndex
+                        };
+                    }
+                    else
+                    {
+                        trainingXSegment.Index = segmentIndex;
+                    }
+                    segmentIndex++;
+                    return trainingXSegment;
+                }).ToList();
+            //training.Segments = dbContext
+            //    .Segments.Where(s => viewModel.Segments.Select(x => x.Id).Contains(s.Id)).ToHashSet();
 
             await AddHistoryLog(training.ShareableId, EditActionType.Edit);
 

@@ -4,6 +4,7 @@ using CoachAssistent.Data;
 using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.Domain;
 using CoachAssistent.Models.Domain.Permissions;
+using CoachAssistent.Models.ViewModels;
 using CoachAssistent.Models.ViewModels.Permission;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -68,6 +69,39 @@ namespace CoachAssistent.Managers
             }
         }
 
+        public IQueryable<T> FilterShareables<T>(IQueryable<T> collection, BaseSearchViewModel search) where T : IShareable
+        {
+            if (search is not null)
+            {
+                if (!string.IsNullOrEmpty(search.Search))
+                {
+                    collection = collection
+                        .Where(e => e.Name.Contains(search.Search)
+                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
+                }
+                if (search.Tags is not null && search.Tags.Any())
+                {
+                    collection = collection
+                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
+                }
+                if (search.OnlyFavorites.HasValue && search.OnlyFavorites.Value)
+                {
+                    collection = collection
+                        .Where(e => e.Shareable!.Favorites.Select(f => f.UserId).Contains(authenticationWrapper.UserId));
+                }
+            }
+            return collection;
+        }
+        public IQueryable<T> PaginateShareables<T>(IQueryable<T> collection, BaseSearchViewModel search) where T : IShareable
+        {
+            if (!search.ShowAll)
+            {
+                collection = collection
+                    .Skip(search.Skip)
+                    .Take(search.ItemsPerPage);
+            }
+            return collection;
+        }
         public IQueryable<T> FilterBySharingLevel<T>(IQueryable<T> collection) where T : IShareable
         {
             collection = collection
