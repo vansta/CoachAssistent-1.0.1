@@ -25,6 +25,12 @@ namespace CoachAssistent.Managers
         {
         }
 
+        public bool CheckUserName(string userName)
+        {
+            return !dbContext.Users
+                .Any(u => u.UserName.Equals(userName));
+        }
+
         public IEnumerable<Guid> GetAssignedEditors(Guid id)
         {
             return dbContext.Editors

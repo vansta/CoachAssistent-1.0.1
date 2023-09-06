@@ -46,6 +46,12 @@ namespace CoachAssistent.Api.Controllers
             return userManager.GetPermissions();
         }
 
+        [HttpGet("CheckUserName")]
+        public bool CheckUserName(string userName)
+        {
+            return userManager.CheckUserName(userName);
+        }
+
         [HttpPut]
         public Task UpdateUser(ProfileViewModel profileViewModel)
         {
