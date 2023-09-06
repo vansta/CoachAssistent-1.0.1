@@ -118,7 +118,7 @@ namespace CoachAssistent.Managers
             await dbContext.SaveChangesAsync();
         }
 
-        public IEnumerable<SelectViewModel> GetAvailableGroups(string? action)
+        public IEnumerable<SelectViewModel> GetAvailableGroups(string? search, string? action)
         {
             IQueryable<Group> groups;
             if (string.IsNullOrEmpty(action))
@@ -134,7 +134,9 @@ namespace CoachAssistent.Managers
                     .Where(m => m.UserId == authenticationWrapper.UserId && m.Role!.RolePermissions.Any(rp => rp.Action!.Name.Equals(action) && rp.Subject!.Name.Equals("group")))
                     .Select(m => m.Group!);
             }
-            return groups.Select(g => new SelectViewModel(g.Id, g.Name))
+            return groups
+                .Where(g => string.IsNullOrEmpty(search) || g.Name.Contains(search))
+                .Select(g => new SelectViewModel(g.Id, g.Name))
                     .ToList();
         }
 
