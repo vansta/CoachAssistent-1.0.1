@@ -73,6 +73,7 @@ namespace CoachAssistent.Managers
 
         public async Task<Guid> Create(Exercise exercise, ICollection<IFormFile> attachments)
         {
+            Can("create", exercise);
             exercise = (await dbContext.Exercises.AddAsync(exercise)).Entity;
 
             string basePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
@@ -102,7 +103,8 @@ namespace CoachAssistent.Managers
                 {
                     SharingLevel = SharingLevel.Public,
                     Editors = CondenseEditors(null),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) }
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) },
+                    ShareablesXGroups = CondenseGroups(null)
                 },
                 Attachments = exercise.Attachments.Select(a => new Attachment
                 {
