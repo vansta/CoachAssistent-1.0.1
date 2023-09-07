@@ -60,6 +60,7 @@ namespace CoachAssistent.Managers
                     .ThenInclude(rp => rp.Fields).ThenInclude(f => f.PermissionField)
                 .SingleAsync(r => r.Id.Equals(roleViewModel.Id));
 
+            Can("update", "role");
             role.Name = roleViewModel.Name ?? "New role";
             role.Description = roleViewModel.Description;
             if (roleViewModel.RolePermissions is not null)

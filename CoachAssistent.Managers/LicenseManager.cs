@@ -46,6 +46,7 @@ namespace CoachAssistent.Managers
                     .ThenInclude(rp => rp.Fields).ThenInclude(f => f.PermissionField)
                 .SingleAsync(r => r.Id.Equals(viewModel.Id));
 
+            Can("update", "license");
             license.Name = viewModel.Name ?? "New license";
             license.Description = viewModel.Description;
             if (viewModel.LicensePermissions is not null)

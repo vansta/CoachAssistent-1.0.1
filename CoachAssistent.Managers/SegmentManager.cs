@@ -74,6 +74,8 @@ namespace CoachAssistent.Managers
                     ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
                 }
             };
+
+            Can("create", segment);
             segment = (await dbContext.Segments.AddAsync(segment)).Entity;
             await dbContext.SaveChangesAsync();
 
@@ -89,6 +91,7 @@ namespace CoachAssistent.Managers
                 .Include(s => s.Shareable!.ShareablesXGroups)
                 .SingleAsync(s => s.Id.Equals(viewModel.Id));
 
+            Can("update", segment);
             segment.Name = viewModel.Name;
             segment.Description = viewModel.Description;
             segment.Tags = CondenseTags(viewModel.Tags);
@@ -130,6 +133,7 @@ namespace CoachAssistent.Managers
             Segment? segment = await dbContext.Segments.FindAsync(id);
             if (segment is not null)
             {
+                Can("delete", segment);
                 await AddHistoryLog(segment.ShareableId, EditActionType.Delete);
                 segment.DeletedTS = DateTime.Now;
                 await dbContext.SaveChangesAsync();

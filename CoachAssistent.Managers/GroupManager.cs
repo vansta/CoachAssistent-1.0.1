@@ -47,6 +47,7 @@ namespace CoachAssistent.Managers
                 SubGroups = dbContext.Groups.Where(g => createGroupViewModel.SubGroups.Select(sg => sg.Id).Contains(g.Id)).ToHashSet()
         };
 
+            Can("create", "group");
             var addGroup = await dbContext.Groups.AddAsync(group);
             await dbContext.SaveChangesAsync();
 
@@ -87,6 +88,7 @@ namespace CoachAssistent.Managers
                 .Include(g => g.SubGroups)
                 .SingleAsync(g => g.Id.Equals(editGroupViewModel.Id));
 
+            Can("update", group);
             group.Name = editGroupViewModel.Name ?? "New group";
             group.Description = editGroupViewModel.Description;
             group.Tags = CondenseTags(editGroupViewModel.Tags);
@@ -116,7 +118,7 @@ namespace CoachAssistent.Managers
             await dbContext.SaveChangesAsync();
         }
 
-        public IEnumerable<SelectViewModel> GetAvailableGroups(string? action)
+        public IEnumerable<SelectViewModel> GetAvailableGroups(string? search, string? action)
         {
             IQueryable<Group> groups;
             if (string.IsNullOrEmpty(action))
@@ -132,15 +134,20 @@ namespace CoachAssistent.Managers
                     .Where(m => m.UserId == authenticationWrapper.UserId && m.Role!.RolePermissions.Any(rp => rp.Action!.Name.Equals(action) && rp.Subject!.Name.Equals("group")))
                     .Select(m => m.Group!);
             }
-            return groups.Select(g => new SelectViewModel(g.Id, g.Name))
+            return groups
+                .Where(g => string.IsNullOrEmpty(search) || g.Name.Contains(search))
+                .Select(g => new SelectViewModel(g.Id, g.Name))
                     .ToList();
         }
 
         public async Task RespondToMembershipRequest(MembershipRequestResponseViewModel response)
         {
-            MembershipRequest? membershipRequest = await dbContext.MembershipRequests.FindAsync(response.Id);
+            MembershipRequest? membershipRequest = await dbContext.MembershipRequests
+                .Include(mr => mr.Group)
+                .FirstOrDefaultAsync(mr => mr.Id == response.Id);
             if (membershipRequest is not null)
             {
+                Can("update", membershipRequest.Group!);
                 if (response.Response)
                 {
                     Guid roleId = response.RoleId ?? dbContext.Roles.OrderBy(r => r.Index).First().Id;
@@ -163,6 +170,14 @@ namespace CoachAssistent.Managers
                 GroupId = groupId,
                 UserId = authenticationWrapper.UserId
             });
+        }
+
+        public IEnumerable<SelectViewModel> GetMembers(Guid groupId)
+        {
+            return dbContext.Members
+                .Include(m => m.User)
+                .Where(m => m.GroupId.Equals(groupId))
+                .Select(m => new SelectViewModel(m.UserId, m.User!.UserName));
         }
     }
 }

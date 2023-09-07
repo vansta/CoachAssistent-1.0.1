@@ -20,11 +20,15 @@ namespace CoachAssistent.Managers
 {
     public class UserManager : BaseAuthenticatedManager
     {
-        //readonly IConfiguration configuration;
         public UserManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
             : base(context, mapper, configuration, authenticationWrapper)
         {
-            //this.configuration = configuration;
+        }
+
+        public bool CheckUserName(string userName)
+        {
+            return !dbContext.Users
+                .Any(u => u.UserName.Equals(userName));
         }
 
         public IEnumerable<Guid> GetAssignedEditors(Guid id)
@@ -34,9 +38,20 @@ namespace CoachAssistent.Managers
                 .Select(e => e.UserId);
         }
 
+        public IEnumerable<SelectViewModel> SearchUsers(string? search)
+        {
+            return dbContext.Users
+                .Where(u => string.IsNullOrEmpty(search) || u.UserName.Contains(search))
+                .Select(u => new SelectViewModel(u.Id, u.UserName));
+        }
+
         public IEnumerable<SelectViewModel> GetAvailableEditors()
         {
-            return dbContext.Users.Select(u => new SelectViewModel(u.Id, u.UserName));
+            return dbContext.Members
+                .Include(m => m.User)
+                .Where(m => authenticationWrapper.User.GroupIds.Contains(m.GroupId))
+                .Select(m => m.User).Distinct()
+                .Select(u => new SelectViewModel(u!.Id, u.UserName));
         }
 
         public async Task<ProfileViewModel> GetProfile()

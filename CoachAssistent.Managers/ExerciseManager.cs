@@ -74,6 +74,7 @@ namespace CoachAssistent.Managers
 
         public async Task<Guid> Create(Exercise exercise, ICollection<IFormFile> attachments)
         {
+            Can("create", exercise);
             exercise = (await dbContext.Exercises.AddAsync(exercise)).Entity;
 
             string basePath = Path.Combine(configuration["AttachmentFolder"] ?? string.Empty, exercise.Id.ToString());
@@ -104,7 +105,8 @@ namespace CoachAssistent.Managers
                     Level = exercise.Shareable!.Level,
                     SharingLevel = SharingLevel.Public,
                     Editors = CondenseEditors(null),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) }
+                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) },
+                    ShareablesXGroups = CondenseGroups(null)
                 },
                 Attachments = exercise.Attachments.Select(a => new Attachment
                 {
@@ -133,6 +135,8 @@ namespace CoachAssistent.Managers
                 .Include(e => e.Shareable!.Editors)
                 .Include(e => e.Shareable!.ShareablesXGroups)
                 .SingleAsync(e => e.Id.Equals(viewModel.Id));
+
+            Can("update", exercise);
 
             exercise.Name = viewModel.Name;
             exercise.Description = viewModel.Description;
@@ -170,12 +174,15 @@ namespace CoachAssistent.Managers
 
         public async Task Delete(Guid id)
         {
+
             Exercise? exercise = await dbContext.Exercises
                 .Include(e => e.Attachments)
                 .SingleOrDefaultAsync(e => e.Id.Equals(id));
-
+            
             if (exercise is not null)
             {
+                Can("delete", exercise);
+
                 exercise.DeletedTS = DateTime.Now;
                 await AddHistoryLog(exercise.ShareableId, EditActionType.Delete);
                 await dbContext.SaveChangesAsync();

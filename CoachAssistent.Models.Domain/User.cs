@@ -18,7 +18,7 @@ namespace CoachAssistent.Models.Domain
         public Guid Id { get; set; }
         [MaxLength(64)]
         public string UserName { get; set; }
-        [MaxLength(64)]
+        [MaxLength(64), DataType(DataType.EmailAddress)]
         public string? Email { get; set; }
         [MaxLength(128)]
         public string? FirstName { get; set; }

@@ -40,9 +40,15 @@ namespace CoachAssistent.Api.Controllers
         }
 
         [HttpGet("Available")]
-        public IEnumerable<SelectViewModel> GetAvailableGroups(string? action = null)
+        public IEnumerable<SelectViewModel> GetAvailableGroups(string? search, string? action = null)
         {
-            return groupManager.GetAvailableGroups(action);
+            return groupManager.GetAvailableGroups(search, action);
+        }
+
+        [HttpGet("Members")]
+        public IEnumerable<SelectViewModel> GetMembers(Guid groupId)
+        {
+            return groupManager.GetMembers(groupId);
         }
 
         [HttpPost]
