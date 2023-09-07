@@ -94,6 +94,11 @@ namespace CoachAssistent.Managers
                     collection = collection
                         .Where(c => c.Shareable!.Level == (Level)level);
                 }
+                if (search.OnlyOwned.HasValue && search.OnlyOwned.Value)
+                {
+                    collection = collection
+                        .Where(c => c.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId));
+                }
             }
             return collection;
         }
