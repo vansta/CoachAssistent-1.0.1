@@ -25,6 +25,7 @@ namespace CoachAssistent.Models.ViewModels.Exercise
         public ICollection<string> Tags { get; set; }
 
         public SharingLevel SharingLevel { get; set; }
+        public Level Level { get; set; }
         public ICollection<Guid> Editors { get; set; }
         public ICollection<Guid> GroupIds { get; set; }
     }

@@ -19,6 +19,7 @@ namespace CoachAssistent.AutomapperBootstrapper.Profiles
                 .ForMember(dest => dest.GroupIds, opt => opt.MapFrom(src => src.Shareable!.ShareablesXGroups.Select(sg => sg.GroupId)))
                 .ForMember(dest => dest.EditorIds, opt => opt.MapFrom(src => src.Shareable!.Editors.Select(sg => sg.UserId)))
                 .ForMember(dest => dest.SharingLevel, opt => opt.MapFrom(src => ((int)src.Shareable!.SharingLevel).ToString()))
+                .ForMember(dest => dest.Level, opt => opt.MapFrom(src => ((int)src.Shareable!.Level).ToString()))
                 .ForMember(dest => dest.IsFavorite, opt => opt.MapFrom(src => src.Shareable!.Favorites.Count > 0));
         }
     }

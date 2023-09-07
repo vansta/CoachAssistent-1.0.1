@@ -62,6 +62,7 @@ namespace CoachAssistent.Managers
                 Shareable = new Shareable
                 {
                     SharingLevel = viewModel.SharingLevel,
+                    Level = viewModel.Level,
                     Editors = CondenseEditors(viewModel.Editors),
                     HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) },
                     ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
@@ -100,6 +101,7 @@ namespace CoachAssistent.Managers
                 Tags = exercise.Tags,
                 Shareable = new Shareable
                 {
+                    Level = exercise.Shareable!.Level,
                     SharingLevel = SharingLevel.Public,
                     Editors = CondenseEditors(null),
                     HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) }
@@ -137,6 +139,7 @@ namespace CoachAssistent.Managers
             exercise.Tags = CondenseTags(viewModel.Tags);
 
             exercise.Shareable!.SharingLevel = viewModel.SharingLevel;
+            exercise.Shareable!.Level = viewModel.Level;
             exercise.Shareable.Editors = CondenseEditors(viewModel.Editors, exercise.Shareable);
             exercise.Shareable.ShareablesXGroups = CondenseGroups(viewModel.GroupIds, exercise.Shareable);
 

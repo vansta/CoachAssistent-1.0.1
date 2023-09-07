@@ -70,6 +70,11 @@ namespace CoachAssistent.Managers
                     collection = collection
                         .Where(e => e.Shareable!.Favorites.Select(f => f.UserId).Contains(authenticationWrapper.UserId));
                 }
+                if (!string.IsNullOrEmpty(search.Level) && int.TryParse(search.Level, out int level))
+                {
+                    collection = collection
+                        .Where(c => c.Shareable!.Level == (Level)level);
+                }
             }
             return collection;
         }

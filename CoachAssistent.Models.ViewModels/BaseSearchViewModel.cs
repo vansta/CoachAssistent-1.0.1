@@ -10,6 +10,7 @@ namespace CoachAssistent.Models.ViewModels
     public class BaseSearchViewModel
     {
         public bool? OnlyFavorites { get; set; }
+        public string? Level { get; set; }
         public string? Search { get; set; }
         public IList<string?>? Tags { get; set; }
         public int CurrentPage { get; set; }

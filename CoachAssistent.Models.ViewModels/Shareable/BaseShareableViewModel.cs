@@ -16,6 +16,7 @@ namespace CoachAssistent.Models.ViewModels.Shareable
         }
         public Guid ShareableId { get; set; }
         public string SharingLevel { get; set; } = null!;
+        public string Level { get; set; } = null!;
         public IEnumerable<Guid> GroupIds { get; set; } = new List<Guid>();
         public IEnumerable<Guid> EditorIds { get; set; } = new List<Guid>();
         public bool IsFavorite { get; set; }

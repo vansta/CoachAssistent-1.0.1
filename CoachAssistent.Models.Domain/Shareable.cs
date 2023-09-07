@@ -11,6 +11,7 @@ namespace CoachAssistent.Models.Domain
     {
         public Guid Id { get; set; }
         public SharingLevel SharingLevel { get; set; }
+        public Level Level { get; set; }
         public ICollection<ShareablesXGroups> ShareablesXGroups { get; set; } = new HashSet<ShareablesXGroups>();
         public ICollection<Editor> Editors { get; set; } = new HashSet<Editor>();
         public ICollection<HistoryLog> HistoryLogs { get; set; } = new HashSet<HistoryLog>();

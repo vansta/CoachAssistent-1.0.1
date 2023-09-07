@@ -68,6 +68,7 @@ namespace CoachAssistent.Managers
                 Shareable = new Shareable
                 {
                     SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel),
+                    Level = (Level)int.Parse(viewModel.Level),
                     Editors = CondenseEditors(viewModel.Editors),
                     HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) },
                     ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
@@ -118,6 +119,7 @@ namespace CoachAssistent.Managers
 
             segment.Shareable!.Editors = CondenseEditors(viewModel.Editors, segment.Shareable);
             segment.Shareable!.SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel);
+            segment.Shareable!.Level = (Level)int.Parse(viewModel.Level);
             segment.Shareable!.ShareablesXGroups = CondenseGroups(viewModel.GroupIds);
 
             await dbContext.SaveChangesAsync();
