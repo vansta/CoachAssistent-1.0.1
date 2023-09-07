@@ -47,7 +47,7 @@ namespace CoachAssistent.Managers
                 SubGroups = dbContext.Groups.Where(g => createGroupViewModel.SubGroups.Select(sg => sg.Id).Contains(g.Id)).ToHashSet()
         };
 
-            Can("create", group);
+            Can("create", "group");
             var addGroup = await dbContext.Groups.AddAsync(group);
             await dbContext.SaveChangesAsync();
 
@@ -170,6 +170,14 @@ namespace CoachAssistent.Managers
                 GroupId = groupId,
                 UserId = authenticationWrapper.UserId
             });
+        }
+
+        public IEnumerable<SelectViewModel> GetMembers(Guid groupId)
+        {
+            return dbContext.Members
+                .Include(m => m.User)
+                .Where(m => m.GroupId.Equals(groupId))
+                .Select(m => new SelectViewModel(m.UserId, m.User!.UserName));
         }
     }
 }

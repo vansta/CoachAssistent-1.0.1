@@ -45,6 +45,12 @@ namespace CoachAssistent.Api.Controllers
             return groupManager.GetAvailableGroups(search, action);
         }
 
+        [HttpGet("Members")]
+        public IEnumerable<SelectViewModel> GetMembers(Guid groupId)
+        {
+            return groupManager.GetMembers(groupId);
+        }
+
         [HttpPost]
         public Task<Guid> CreateGroup(CreateGroupViewModel createGroupViewModel)
         {

@@ -27,6 +27,11 @@ namespace CoachAssistent.Api.Controllers
         {
             return userManager.GetAvailableEditors();
         }
+        [HttpGet("Search")]
+        public IEnumerable<SelectViewModel> SearchUsers(string? search = null)
+        {
+            return userManager.SearchUsers(search);
+        }
 
         [HttpGet("Profile")]
         public Task<ProfileViewModel> GetProfile()
