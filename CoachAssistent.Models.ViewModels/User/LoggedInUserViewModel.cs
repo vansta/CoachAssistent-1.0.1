@@ -19,5 +19,6 @@ namespace CoachAssistent.Models.ViewModels.User
         public string? LicenseLevel { get; set; }
 
         public IEnumerable<Guid> GroupIds { get; set; }
+        public IEnumerable<string> Tags { get; set; } = new List<string>();
     }
 }

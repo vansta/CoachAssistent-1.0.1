@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CoachAssistent.Data;
 using CoachAssistent.Managers;
+using CoachAssistent.Managers.Helpers;
 using CoachAssistent.Models.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,9 +14,10 @@ namespace CoachAssistent.Api.Controllers
     public class AuthenticationController : ControllerBase
     {
         readonly AccountManager accountManager;
-        public AuthenticationController(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration)
+        public AuthenticationController(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            accountManager = new AccountManager(dbContext, mapper, configuration);
+            IAuthenticationWrapper authenticationWrapper = new AuthenticationWrapper(httpContextAccessor);
+            accountManager = new AccountManager(dbContext, mapper, configuration, authenticationWrapper);
         }
 
         [Authorize]
@@ -24,6 +26,13 @@ namespace CoachAssistent.Api.Controllers
         {
             //return Unauthorized();
             return Ok("Ok");
+        }
+
+        [Authorize]
+        [HttpGet("RefreshToken")]
+        public Task<string> RefreshToken()
+        {
+            return accountManager.RefreshToken();
         }
 
         [HttpPost]

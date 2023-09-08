@@ -62,5 +62,6 @@ namespace CoachAssistent.Managers.Helpers
         public static string Groups { get { return "Groups"; } }
         public static string License { get { return "License"; } }
         public static string LicenseLevel { get { return "LicenseLevel"; } }
+        public static string Tags { get { return "Tags"; } }
     }
 }

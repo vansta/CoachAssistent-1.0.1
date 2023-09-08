@@ -18,13 +18,14 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class AccountManager : BaseManager
+    public class AccountManager : BaseAuthenticatedManager
     {
         readonly JwtHelper jwtHelper;
         const int iterations = 32;
         const int saltSize = 20;
         readonly HashAlgorithmName hashAlgorithmName = HashAlgorithmName.SHA256;
-        public AccountManager(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration) : base(dbContext, mapper)
+        public AccountManager(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) 
+            : base(dbContext, mapper, configuration, authenticationWrapper)
         {
             //this.configuration = configuration;
             jwtHelper = new JwtHelper(configuration);
@@ -39,6 +40,16 @@ namespace CoachAssistent.Managers
 
             LoggedInUserViewModel user = await CreateUser(registerData);
             return jwtHelper.GenerateJwt(user);
+        }
+
+        public async Task<string> RefreshToken()
+        {
+            User? user = await dbContext.Users
+                .Include(u => u.Memberships)
+                .Include(u => u.License)
+                .Include(u => u.Tags)
+                .FirstOrDefaultAsync(u => u.Id.Equals(authenticationWrapper.UserId));
+            return jwtHelper.GenerateJwt(mapper.Map<LoggedInUserViewModel>(user));
         }
 
         public async Task<string> Login(CredentialsViewModel credentials)
@@ -92,6 +103,7 @@ namespace CoachAssistent.Managers
             User? user = await dbContext.Users
                 .Include(u => u.Memberships)
                 .Include(u => u.License)
+                .Include(u => u.Tags)
                 .FirstOrDefaultAsync(u => u.UserName.Equals(credentials.UserName));
             if (user == null)
             {
