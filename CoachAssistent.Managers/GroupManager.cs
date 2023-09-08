@@ -179,5 +179,13 @@ namespace CoachAssistent.Managers
                 .Where(m => m.GroupId.Equals(groupId))
                 .Select(m => new SelectViewModel(m.UserId, m.User!.UserName));
         }
+
+        public async Task<GroupMinimalViewModel> GetGroupMinimal(Guid id)
+        {
+            Group group = await dbContext.Groups
+                .SingleAsync(g => g.Id.Equals(id));
+
+            return mapper.Map<GroupMinimalViewModel>(group);
+        }
     }
 }

@@ -33,6 +33,12 @@ namespace CoachAssistent.Api.Controllers
             return groupManager.GetGroups();
         }
 
+        [HttpGet("Minimal")]
+        public Task<GroupMinimalViewModel> GetGroupMinimal(Guid id)
+        {
+            return groupManager.GetGroupMinimal(id);
+        }
+
         [HttpGet("Details")]
         public Task<EditGroupViewModel> GetGroup(Guid id)
         {
