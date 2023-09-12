@@ -37,6 +37,7 @@ namespace CoachAssistent.Data
         public DbSet<LicensePermission> LicensePermissions => Set<LicensePermission>();
         public DbSet<LicensePermissionXPermissionField> LicensePermissionXPermissionFields => Set<LicensePermissionXPermissionField>();
         public DbSet<Favorite> Favorites => Set<Favorite>();
+        public DbSet<PasswordResetRequest> PasswordResetRequests => Set<PasswordResetRequest>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

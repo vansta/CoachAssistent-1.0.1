@@ -35,6 +35,12 @@ namespace CoachAssistent.Api.Controllers
             return accountManager.RefreshToken();
         }
 
+        [HttpGet("ResetRequest")]
+        public Task<ResetPasswordViewModel> GetResetRequest(Guid id)
+        {
+            return accountManager.ResetRequest(id);
+        }
+
         [HttpPost]
         public Task<string> Login(CredentialsViewModel credentials)
         {
@@ -45,6 +51,18 @@ namespace CoachAssistent.Api.Controllers
         public Task<string> Register(RegisterViewModel registerData)
         {
             return accountManager.Register(registerData);
+        }
+
+        [HttpPost("RequestResetPassword")]
+        public Task ResetPassword([FromBody]string userName)
+        {
+            return accountManager.RequestPasswordReset(userName);
+        }
+
+        [HttpPost("ResetPassword")]
+        public Task<string> ResetPassword(ResetPasswordViewModel credentials)
+        {
+            return accountManager.ResetPassword(credentials);
         }
     }
 }

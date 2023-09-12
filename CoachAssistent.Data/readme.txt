@@ -1,4 +1,4 @@
-﻿dotnet ef migrations add dotnet ef database update --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\ --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\
+﻿dotnet ef migrations add <Migration> --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\
 
 dotnet ef migrations remove --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\
 
