@@ -31,4 +31,10 @@
     <ProjectReference Include="..\CoachAssistent.Models.ViewModels\CoachAssistent.Models.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Content\Templates\PasswordReset\nl.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
