@@ -38,6 +38,7 @@ namespace CoachAssistent.Data
         public DbSet<LicensePermissionXPermissionField> LicensePermissionXPermissionFields => Set<LicensePermissionXPermissionField>();
         public DbSet<Favorite> Favorites => Set<Favorite>();
         public DbSet<PasswordResetRequest> PasswordResetRequests => Set<PasswordResetRequest>();
+        public DbSet<Notification> Notifications => Set<Notification>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -94,8 +95,17 @@ namespace CoachAssistent.Data
                 .HasOne(hl => hl.Origin)
                 .WithMany(s => s.Copies);
 
-            Guid adminLicenseId = new("c7b16ea3-26db-4ad0-a66d-697e453d8b0c");
-            Guid defaultLicenseId = new("ad48ebbb-ae91-457f-b108-6b86d45ad02c");
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.NotificationsFrom)
+                .WithOne(nf => nf.FromUser)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.NotificationsTo)
+                .WithOne(nf => nf.ToUser)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            Guid adminLicenseId = SeedingLibrary.AdminLicenseId;
+            Guid defaultLicenseId = SeedingLibrary.DefaultLicenseId;
 
             modelBuilder.Entity<License>()
                 .HasData(new License
@@ -113,9 +123,9 @@ namespace CoachAssistent.Data
                     Level = 1
                 });
 
-            Guid adminId = new("5E8876EE-A3F0-4714-9566-22411FAA32D4");
-            Guid writerId = new("4948B3BA-6061-4995-AC82-2DA4885839E5");
-            Guid readerId = new("AE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
+            Guid adminId = SeedingLibrary.AdminId;
+            Guid writerId = SeedingLibrary.WriterId;
+            Guid readerId = SeedingLibrary.ReaderId;
             //Guid editorId = new Guid("BE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
             //Guid defaultId = new Guid("CE0AFD1F-4667-41A9-BEF5-0EE9328BE9CA");
             modelBuilder.Entity<Role>()
@@ -185,7 +195,7 @@ namespace CoachAssistent.Data
                     Name = "license"
                 });
 
-            List<PermissionField> permissionFields = new List<PermissionField>
+            List<PermissionField> permissionFields = new()
             {
                 //shareable
                 new PermissionField

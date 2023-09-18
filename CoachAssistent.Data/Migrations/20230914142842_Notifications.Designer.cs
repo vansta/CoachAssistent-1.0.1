@@ -4,6 +4,7 @@ using CoachAssistent.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoachAssistent.Data.Migrations
 {
     [DbContext(typeof(CoachAssistentDbContext))]
-    partial class CoachAssistentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230914142842_Notifications")]
+    partial class Notifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -314,28 +317,6 @@ namespace CoachAssistent.Data.Migrations
                     b.HasIndex("ToUserId");
 
                     b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("CoachAssistent.Models.Domain.PasswordResetRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("RequestDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ResetDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PasswordResetRequests");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
@@ -1390,17 +1371,6 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("Shareable");
 
                     b.Navigation("ToUser");
-                });
-
-            modelBuilder.Entity("CoachAssistent.Models.Domain.PasswordResetRequest", b =>
-                {
-                    b.HasOne("CoachAssistent.Models.Domain.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
