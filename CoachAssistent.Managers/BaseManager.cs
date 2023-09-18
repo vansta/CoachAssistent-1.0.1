@@ -37,6 +37,18 @@ namespace CoachAssistent.Managers
                     RequestTimestamp = DateTime.Now
                 };
                 await dbContext.MembershipRequests.AddAsync(membershipRequest);
+
+                IQueryable<Guid> administrators = dbContext.Members
+                    .Where(m => m.GroupId.Equals(request.GroupId) && m.RoleId.Equals(SeedingLibrary.AdminId))
+                    .Select(m => m.UserId);
+                await dbContext.Notifications.AddRangeAsync(administrators.Select(a => new Notification
+                {
+                    FromUserId = request.UserId,
+                    ToUserId = a,
+                    GroupId = request.GroupId,
+                    NotificationType = NotificationType.MembershipRequest,
+                    SentDateTime = DateTime.Now
+                }));
             }
             await dbContext.SaveChangesAsync();
         }
