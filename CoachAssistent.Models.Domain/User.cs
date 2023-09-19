@@ -39,5 +39,6 @@ namespace CoachAssistent.Models.Domain
         public ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
         public ICollection<Notification> NotificationsFrom { get; set; } = new HashSet<Notification>();
         public ICollection<Notification> NotificationsTo { get; set; } = new HashSet<Notification>();
+        public ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
     }
 }

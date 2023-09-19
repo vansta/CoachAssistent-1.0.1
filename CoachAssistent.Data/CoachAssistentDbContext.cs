@@ -38,6 +38,7 @@ namespace CoachAssistent.Data
         public DbSet<LicensePermissionXPermissionField> LicensePermissionXPermissionFields => Set<LicensePermissionXPermissionField>();
         public DbSet<Favorite> Favorites => Set<Favorite>();
         public DbSet<Notification> Notifications => Set<Notification>();
+        public DbSet<Review> Reviews => Set<Review>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
