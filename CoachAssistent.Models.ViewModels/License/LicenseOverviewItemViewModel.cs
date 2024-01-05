@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.ViewModels.License
 {
-    public class LicenseOverviewItemViewModel : BaseAbilityViewModel
+    public class LicenseOverviewItemViewModel() : BaseAbilityViewModel("license")
     {
-        public LicenseOverviewItemViewModel() : base("license")
-        {
-
-        }
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }

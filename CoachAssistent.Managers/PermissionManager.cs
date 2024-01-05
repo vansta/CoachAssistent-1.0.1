@@ -13,15 +13,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class PermissionManager : BaseAuthenticatedManager
+    public class PermissionManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        //readonly IConfiguration configuration;
-        public PermissionManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-            //this.configuration = configuration;
-        }
-
         public IEnumerable<SelectViewModel> GetActions()
         {
             return dbContext.PermissionActions

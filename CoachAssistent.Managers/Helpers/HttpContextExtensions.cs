@@ -36,13 +36,16 @@ namespace CoachAssistent.Managers.Helpers
             string? email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
             Guid groupId;
-            List<Guid> groupIds = claims
-                .Where(c => c.Type == CustomClaimTypes.Groups)
-                //.Select(c => c.Value)
-                .AsQueryable()
-                .Select(g => Guid.TryParse(g.Value, out groupId) ? groupId : Guid.Empty)
-                .Where(g => !g.Equals(Guid.Empty))
-                .ToList();
+            List<Guid> groupIds =
+            [
+                .. claims
+                                .Where(c => c.Type == CustomClaimTypes.Groups)
+                                //.Select(c => c.Value)
+                                .AsQueryable()
+                                .Select(g => Guid.TryParse(g.Value, out groupId) ? groupId : Guid.Empty)
+                                .Where(g => !g.Equals(Guid.Empty))
+,
+            ];
 
             return new LoggedInUserViewModel
             {

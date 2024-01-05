@@ -16,16 +16,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class RoleManager : BaseAuthenticatedManager
+    public class RoleManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        readonly IConfiguration configuration;
-
-        public RoleManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-            this.configuration = configuration;
-        }
-
         public IEnumerable<SelectViewModel> GetRoles()
         {
             return dbContext.Roles.Select(r => new SelectViewModel(r.Id, r.Name));

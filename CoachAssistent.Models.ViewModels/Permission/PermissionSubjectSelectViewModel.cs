@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.ViewModels.Permission
 {
-    public class PermissionSubjectSelectViewModel : SelectViewModel
+    public class PermissionSubjectSelectViewModel(int id, string? title) : SelectViewModel(id, title)
     {
-        public PermissionSubjectSelectViewModel(int id, string? title) : base(id, title)
-        {
-
-        }
         public IEnumerable<SelectViewModel> Fields { get; set; } = new List<SelectViewModel>();
     }
 }

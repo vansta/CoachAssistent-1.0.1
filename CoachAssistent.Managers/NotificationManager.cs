@@ -13,16 +13,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class NotificationManager : BaseAuthenticatedManager
+    public class NotificationManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        readonly IConfiguration configuration;
-
-        public NotificationManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-            this.configuration = configuration;
-        }
-
         public IEnumerable<NotificationOverviewItemViewModel> GetNotifications(DateTime? lastCheck)
         {
             return dbContext.Notifications

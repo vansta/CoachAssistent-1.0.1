@@ -16,13 +16,8 @@ using CoachAssistent.Models.ViewModels.License;
 
 namespace CoachAssistent.Managers
 {
-    public class LicenseManager : BaseAuthenticatedManager
+    public class LicenseManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        public LicenseManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-        }
-
         public OverviewViewModel<LicenseOverviewItemViewModel> GetOverview()
         {
             IQueryable<License> licenses = dbContext.Licenses

@@ -20,21 +20,14 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class AccountManager : BaseAuthenticatedManager
+    public class AccountManager(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(dbContext, mapper, configuration, authenticationWrapper)
     {
-        readonly JwtHelper jwtHelper;
+        readonly JwtHelper jwtHelper = new(configuration);
         const int iterations = 32;
         const int saltSize = 20;
         readonly HashAlgorithmName hashAlgorithmName = HashAlgorithmName.SHA256;
-        readonly SmtpUtility smtpUtility;
-        readonly IConfiguration _configuration;
-        public AccountManager(CoachAssistentDbContext dbContext, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) 
-            : base(dbContext, mapper, configuration, authenticationWrapper)
-        {
-            jwtHelper = new JwtHelper(configuration);
-            smtpUtility = new SmtpUtility(configuration.GetSection("Smtp").Get<SmtpConfiguration>());
-            _configuration = configuration;
-        }
+        readonly SmtpUtility smtpUtility = new(configuration.GetSection("Smtp").Get<SmtpConfiguration>());
+        readonly IConfiguration _configuration = configuration;
 
         public async Task<string> Register(RegisterViewModel registerData)
         {
@@ -65,11 +58,7 @@ namespace CoachAssistent.Managers
 
         public async Task RequestPasswordReset(string userName)
         {
-            User? user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName!.Equals(userName));
-            if (user is null)
-            {
-                throw new Exception("Username not found");
-            }
+            User? user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName!.Equals(userName)) ?? throw new Exception("Username not found");
             PasswordResetRequest passwordResetRequest = new()
             {
                 UserId = user.Id,
@@ -138,11 +127,7 @@ namespace CoachAssistent.Managers
                 .Include(u => u.Memberships)
                 .Include(u => u.License)
                 .Include(u => u.Tags)
-                .FirstOrDefaultAsync(u => u.UserName.Equals(credentials.UserName));
-            if (user == null)
-            {
-                throw new Exception($"No user found for {credentials.UserName}");
-            }
+                .FirstOrDefaultAsync(u => u.UserName.Equals(credentials.UserName)) ?? throw new Exception($"No user found for {credentials.UserName}");
             using var deriveBytes = new Rfc2898DeriveBytes(credentials.PasswordHash, user.Salt, iterations, hashAlgorithmName);
             byte[] key = deriveBytes.GetBytes(saltSize);
             if (key.SequenceEqual(user.Key))

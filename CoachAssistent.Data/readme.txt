@@ -4,4 +4,4 @@ dotnet ef migrations remove --project .\CoachAssistent.Data --startup-project .\
 
 dotnet ef database update --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\
 
-dotnet ef migrations script --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\ <PreviousMigration>
+dotnet ef migrations script --project .\CoachAssistent.Data --startup-project .\CoachAssistent.Api\ PasswordReset

@@ -18,13 +18,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class UserManager : BaseAuthenticatedManager
+    public class UserManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        public UserManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-        }
-
         public bool CheckUserName(string userName)
         {
             return !dbContext.Users

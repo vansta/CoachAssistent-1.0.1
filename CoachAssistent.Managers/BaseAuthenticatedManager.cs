@@ -16,15 +16,10 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public abstract class BaseAuthenticatedManager : BaseManager
+    public abstract class BaseAuthenticatedManager(CoachAssistentDbContext context, IMapper _mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseManager(context, _mapper)
     {
-        internal readonly IAuthenticationWrapper authenticationWrapper;
-        readonly IConfiguration _configuration;
-        public BaseAuthenticatedManager(CoachAssistentDbContext context, IMapper _mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : base(context, _mapper)
-        {
-            this.authenticationWrapper = authenticationWrapper;
-            this._configuration = configuration;
-        }
+        internal readonly IAuthenticationWrapper authenticationWrapper = authenticationWrapper;
+        readonly IConfiguration _configuration = configuration;
 
         public void Can(string action, string subject)
         {
@@ -102,7 +97,7 @@ namespace CoachAssistent.Managers
             }
             return collection;
         }
-        public IQueryable<T> PaginateShareables<T>(IQueryable<T> collection, BaseSearchViewModel search) where T : IShareable
+        public static IQueryable<T> PaginateShareables<T>(IQueryable<T> collection, BaseSearchViewModel search) where T : IShareable
         {
             if (!search.ShowAll)
             {
@@ -161,7 +156,7 @@ namespace CoachAssistent.Managers
             {
                 Tag? tag = dbContext.Tags.FirstOrDefault(t => t.Name.ToUpper().Equals(x.ToUpper()));
                 return tag ?? new Tag { Name = x };
-            }).ToList() ?? new List<Tag>();
+            }).ToList() ?? [];
         }
 
         internal ICollection<Editor> CondenseEditors(IEnumerable<Guid>? editors, Shareable? shareable = null)
@@ -175,7 +170,7 @@ namespace CoachAssistent.Managers
                 else
                 {
                     //editors must contain at least one user
-                    return new List<Editor> { new Editor { UserId = authenticationWrapper.UserId } };
+                    return new List<Editor> { new() { UserId = authenticationWrapper.UserId } };
                 }
             };
 
@@ -186,7 +181,7 @@ namespace CoachAssistent.Managers
             }).ToList();
         }
 
-        internal ICollection<ShareablesXGroups> CondenseGroups(IEnumerable<Guid>? groupIds, Shareable? shareable = null)
+        internal static ICollection<ShareablesXGroups> CondenseGroups(IEnumerable<Guid>? groupIds, Shareable? shareable = null)
         {
             if (groupIds is null || !groupIds.Any())
             {
@@ -202,7 +197,7 @@ namespace CoachAssistent.Managers
 
         public IEnumerable<RolePermissionViewModel> GetPermissions()
         {
-            List<RolePermissionViewModel> permissions = new List<RolePermissionViewModel>();
+            List<RolePermissionViewModel> permissions = [];
             Guid licenseId;
             if (authenticationWrapper.IsLoggedIn)
             {
@@ -228,7 +223,7 @@ namespace CoachAssistent.Managers
             }
             else
             {
-                permissions = new List<RolePermissionViewModel>();
+                permissions = [];
                 licenseId = dbContext.Licenses
                     .OrderBy(l => l.Level)
                     .First().Id;

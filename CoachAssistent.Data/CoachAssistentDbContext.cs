@@ -4,14 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CoachAssistent.Data
 {
-    public class CoachAssistentDbContext : DbContext
+    public class CoachAssistentDbContext(DbContextOptions<CoachAssistentDbContext> options) : DbContext(options)
     {
-        public CoachAssistentDbContext(DbContextOptions<CoachAssistentDbContext> options)
-            : base(options)
-        {
-            
-        }
-
         public DbSet<Attachment> Attachments => Set<Attachment>();
         public DbSet<Exercise> Exercises => Set<Exercise>();
         public DbSet<Group> Groups => Set<Group>();
@@ -195,8 +189,8 @@ namespace CoachAssistent.Data
                     Name = "license"
                 });
 
-            List<PermissionField> permissionFields = new()
-            {
+            List<PermissionField> permissionFields =
+            [
                 //shareable
                 new PermissionField
                 {
@@ -289,7 +283,7 @@ namespace CoachAssistent.Data
                     Name = "permissions",
                     SubjectId = 4
                 }
-            };
+            ];
 
             modelBuilder.Entity<PermissionField>()
                 .HasData(permissionFields);

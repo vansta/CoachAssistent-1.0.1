@@ -9,13 +9,10 @@ namespace CoachAssistent.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TagController : ControllerBase
+    public class TagController(CoachAssistentDbContext context, IMapper mapper) : ControllerBase
     {
-        readonly TagManager tagManager;
-        public TagController(CoachAssistentDbContext context, IMapper mapper)
-        {
-            tagManager = new TagManager(context, mapper);
-        }
+        readonly TagManager tagManager = new(context, mapper);
+
         [HttpGet]
         public IEnumerable<string> GetTags(string? search)
         {

@@ -10,13 +10,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class TagManager : BaseManager
+    public class TagManager(CoachAssistentDbContext context, IMapper mapper) : BaseManager(context, mapper)
     {
-        public TagManager(CoachAssistentDbContext context, IMapper mapper) : base (context, mapper)
-        {
-
-        }
-
         public IEnumerable<string> GetTags(string? search)
         {
             IQueryable<Tag> tags = dbContext.Tags;

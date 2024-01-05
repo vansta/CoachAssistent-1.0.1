@@ -12,13 +12,8 @@ using System.Linq;
 
 namespace CoachAssistent.Managers
 {
-    public class SegmentManager : BaseAuthenticatedManager
+    public class SegmentManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        public SegmentManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-
-        }
         public OverviewViewModel<SegmentOverviewItemViewModel> GetSegments(BaseSearchViewModel search)
         {
             IQueryable<Segment> segments = dbContext.Segments
@@ -70,7 +65,7 @@ namespace CoachAssistent.Managers
                     SharingLevel = (SharingLevel)int.Parse(viewModel.SharingLevel),
                     Level = (Level)int.Parse(viewModel.Level),
                     Editors = CondenseEditors(viewModel.Editors),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) },
+                    HistoryLogs = new List<HistoryLog> { new(EditActionType.Create, authenticationWrapper.UserId) },
                     ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
                 }
             };

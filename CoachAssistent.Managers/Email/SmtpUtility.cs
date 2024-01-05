@@ -9,13 +9,10 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers.Email
 {
-    public class SmtpUtility
+    public class SmtpUtility(SmtpConfiguration? configuration)
     {
-        readonly SmtpConfiguration _configuration;
-        public SmtpUtility(SmtpConfiguration? configuration)
-        {
-            _configuration = configuration!;
-        }
+        readonly SmtpConfiguration _configuration = configuration!;
+
         public async Task SendMailAsync(Content content)
         {
             using var client = new SmtpClient

@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.ViewModels.Group
 {
-    public class CreateGroupViewModel : BaseAbilityViewModel
+    public class CreateGroupViewModel() : BaseAbilityViewModel("group")
     {
-        public CreateGroupViewModel() : base ("group")
-        {
-
-        }
         public Guid? ParentGroupId { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
