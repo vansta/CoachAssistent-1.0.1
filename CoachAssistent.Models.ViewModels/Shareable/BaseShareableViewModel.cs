@@ -16,5 +16,6 @@ namespace CoachAssistent.Models.ViewModels.Shareable
         public IEnumerable<Guid> GroupIds { get; set; } = new List<Guid>();
         public IEnumerable<Guid> EditorIds { get; set; } = new List<Guid>();
         public bool IsFavorite { get; set; }
+        public bool Verified { get; set; }
     }
 }

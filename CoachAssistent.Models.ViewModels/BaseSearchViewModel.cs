@@ -11,6 +11,7 @@ namespace CoachAssistent.Models.ViewModels
     {
         public bool? OnlyFavorites { get; set; }
         public bool? OnlyOwned { get; set; }
+        public bool? OnlyVerified { get; set; }
         public string? Level { get; set; }
         public string? Search { get; set; }
         public IList<string?>? Tags { get; set; }

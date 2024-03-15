@@ -31,6 +31,8 @@ namespace CoachAssistent.Models.Domain
         public DateTime CreationDate { get; set; }
         public DateTime LastUpdate { get; set; }
 
+        public int Points { get; set; }
+
         public Guid LicenseId { get; set; }
         public License? License { get; set; }
         public ICollection<Member> Memberships { get; set; }

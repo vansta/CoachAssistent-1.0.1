@@ -20,16 +20,19 @@ namespace CoachAssistent.Managers
     {
         internal readonly IAuthenticationWrapper authenticationWrapper = authenticationWrapper;
         readonly IConfiguration _configuration = configuration;
-
-        public void Can(string action, string subject)
+        public bool Can(string action, string subject, bool block = true)
         {
             IEnumerable<RolePermissionViewModel> rolePermissions = GetPermissions();
             bool can = rolePermissions.Any(rp =>
                 rp.Subject!.Equals(subject)
                 && rp.Action!.Equals(action));
-            if (!can)
+            if (!can && block)
             {
                 throw new UnauthorizedAccessException();
+            }
+            else
+            {
+                return can;
             }
         }
 
@@ -66,35 +69,38 @@ namespace CoachAssistent.Managers
 
         public IQueryable<T> FilterShareables<T>(IQueryable<T> collection, BaseSearchViewModel search) where T : IShareable
         {
-            if (search is not null)
+            if (!string.IsNullOrEmpty(search.Search))
             {
-                if (!string.IsNullOrEmpty(search.Search))
-                {
-                    collection = collection
-                        .Where(e => e.Name.Contains(search.Search)
-                            || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
-                }
-                if (search.Tags is not null && search.Tags.Any())
-                {
-                    collection = collection
-                        .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
-                }
-                if (search.OnlyFavorites.HasValue && search.OnlyFavorites.Value)
-                {
-                    collection = collection
-                        .Where(e => e.Shareable!.Favorites.Select(f => f.UserId).Contains(authenticationWrapper.UserId));
-                }
-                if (!string.IsNullOrEmpty(search.Level) && int.TryParse(search.Level, out int level))
-                {
-                    collection = collection
-                        .Where(c => c.Shareable!.Level == (Level)level);
-                }
-                if (search.OnlyOwned.HasValue && search.OnlyOwned.Value)
-                {
-                    collection = collection
-                        .Where(c => c.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId));
-                }
+                collection = collection
+                    .Where(e => e.Name.Contains(search.Search)
+                        || (!string.IsNullOrEmpty(e.Description) && e.Description.Contains(search.Search)));
             }
+            if (search.Tags is not null && search.Tags.Any())
+            {
+                collection = collection
+                    .Where(e => e.Tags.Select(t => t.Name).Any(t => search.Tags.Contains(t)));
+            }
+            if (search.OnlyFavorites.HasValue && search.OnlyFavorites.Value)
+            {
+                collection = collection
+                    .Where(e => e.Shareable!.Favorites.Select(f => f.UserId).Contains(authenticationWrapper.UserId));
+            }
+            if (!string.IsNullOrEmpty(search.Level) && int.TryParse(search.Level, out int level))
+            {
+                collection = collection
+                    .Where(c => c.Shareable!.Level == (Level)level);
+            }
+            if (search.OnlyOwned.HasValue && search.OnlyOwned.Value)
+            {
+                collection = collection
+                    .Where(c => c.Shareable!.Editors.Select(e => e.UserId).Contains(authenticationWrapper.UserId));
+            }
+            if (search.OnlyVerified.HasValue && search.OnlyVerified.Value)
+            {
+                collection = collection
+                    .Where(c => c.Shareable!.VerifiedTS.HasValue);
+            }
+
             return collection;
         }
         public static IQueryable<T> PaginateShareables<T>(IQueryable<T> collection, BaseSearchViewModel search) where T : IShareable
@@ -117,7 +123,6 @@ namespace CoachAssistent.Managers
             }
             else
             {
-                var test = collection.ToList();
                 Guid userId = authenticationWrapper.UserId;
                 IEnumerable<Guid> groupIds = authenticationWrapper.User.GroupIds;
                 collection = collection
@@ -135,6 +140,12 @@ namespace CoachAssistent.Managers
                             && c.Shareable.ShareablesXGroups.Any(sg => groupIds.Contains(sg.GroupId))
                         )
                     ));
+            }
+
+            if (!Can("Verify", "Shareable", false))
+            {
+                collection = collection
+                    .Where(c => c.Shareable!.VerifiedTS.HasValue);
             }
 
             return collection;
