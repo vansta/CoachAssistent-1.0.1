@@ -54,17 +54,18 @@ namespace CoachAssistent.Managers.Helpers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, $"{user.Id}"),
-                new Claim(CustomClaimTypes.Id, $"{user.Id}"),
-                new Claim(ClaimTypes.Name, user.UserName ?? ""),
-                new Claim(CustomClaimTypes.Name, user.UserName ?? ""),
-                new Claim(ClaimTypes.Email, user.Email ?? ""),
-                new Claim(CustomClaimTypes.Email, user.Email ?? ""),
-                new Claim(CustomClaimTypes.License, user.LicenseId.ToString() ?? ""),
-                new Claim(CustomClaimTypes.LicenseLevel, user.LicenseLevel ?? ""),
+                new(ClaimTypes.NameIdentifier, $"{user.Id}"),
+                new(CustomClaimTypes.Id, $"{user.Id}"),
+                new(ClaimTypes.Name, user.UserName ?? ""),
+                new(CustomClaimTypes.Name, user.UserName ?? ""),
+                new(ClaimTypes.Email, user.Email ?? ""),
+                new(CustomClaimTypes.Email, user.Email ?? ""),
+                new(CustomClaimTypes.License, user.LicenseId.ToString() ?? ""),
+                new(CustomClaimTypes.LicenseLevel, user.LicenseLevel ?? "")
             };
 
             claims.AddRange(user.GroupIds.Select(gi => new Claim(CustomClaimTypes.Groups, gi.ToString())));
+            claims.AddRange(user.Tags.Select(t => new Claim(CustomClaimTypes.Tags, t)));
 
             JwtSecurityToken jwt = new(
                 issuer: issuer,

@@ -36,5 +36,8 @@ namespace CoachAssistent.Models.Domain
         public ICollection<Member> Memberships { get; set; }
         public ICollection<MembershipRequest> MembershipRequests { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
+        public ICollection<Tag> Tags { get; set; } = new HashSet<Tag>();
+        public ICollection<Notification> NotificationsFrom { get; set; } = new HashSet<Notification>();
+        public ICollection<Notification> NotificationsTo { get; set; } = new HashSet<Notification>();
     }
 }

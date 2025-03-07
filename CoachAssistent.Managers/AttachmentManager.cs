@@ -11,14 +11,9 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class AttachmentManager : BaseManager
+    public class AttachmentManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration) : BaseManager(context, mapper)
     {
-        readonly IConfiguration configuration;
-        public AttachmentManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration)
-            : base(context, mapper)
-        {
-            this.configuration = configuration;
-        }
+        readonly IConfiguration configuration = configuration;
 
         public async Task<byte[]> GetAttachment(Guid id)
         {

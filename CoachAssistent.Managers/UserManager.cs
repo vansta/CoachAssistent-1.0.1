@@ -18,13 +18,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class UserManager : BaseAuthenticatedManager
+    public class UserManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        public UserManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-        }
-
         public bool CheckUserName(string userName)
         {
             return !dbContext.Users
@@ -57,6 +52,7 @@ namespace CoachAssistent.Managers
         public async Task<ProfileViewModel> GetProfile()
         {
             User user = await dbContext.Users
+                .Include(u => u.Tags)
                 .Include(u => u.Memberships)
                     .ThenInclude(m => m.Group)
                 .Include(u => u.Memberships)
@@ -78,12 +74,14 @@ namespace CoachAssistent.Managers
         {
             User user = await dbContext.Users
                 .Include(u => u.Memberships)
+                .Include(u => u.Tags)
                 .SingleAsync(u => u.Id == authenticationWrapper.UserId);
 
             user.UserName = profileViewModel.UserName ?? user.UserName;
             user.Email = profileViewModel.Email;
             user.Memberships = user.Memberships
                 .Where(m => profileViewModel.Memberships.Select(ms => ms.Id).Contains(m.Id)).ToHashSet();
+            user.Tags = CondenseTags(profileViewModel.Tags);
 
             foreach (var group in profileViewModel.Memberships.Where(g => !user.Memberships.Select(m => m.GroupId).Contains(g.GroupId)))
             {

@@ -15,16 +15,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class GroupManager : BaseAuthenticatedManager
+    public class GroupManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        //readonly IConfiguration configuration;
-
-        public GroupManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper)
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-            //this.configuration = configuration;
-        }
-
         public async Task<IEnumerable<SelectViewModel>> GetGroupsForUser()
         {
             User user = await dbContext.Users
@@ -43,7 +35,7 @@ namespace CoachAssistent.Managers
                 Description = createGroupViewModel.Description,
                 Tags = CondenseTags(createGroupViewModel.Tags),
                 Members = createGroupViewModel.Members is not null ? createGroupViewModel.Members.Select(m => new Member() { UserId = m.UserId, RoleId = m.RoleId }).ToList()
-                : new List<Member>(),
+                : [],
                 SubGroups = dbContext.Groups.Where(g => createGroupViewModel.SubGroups.Select(sg => sg.Id).Contains(g.Id)).ToHashSet()
         };
 
@@ -93,7 +85,7 @@ namespace CoachAssistent.Managers
             group.Description = editGroupViewModel.Description;
             group.Tags = CondenseTags(editGroupViewModel.Tags);
 
-            if (editGroupViewModel.Members is not null && editGroupViewModel.Members.Any())
+            if (editGroupViewModel.Members is not null && editGroupViewModel.Members.Count != 0)
             {
                 group.Members = editGroupViewModel.Members.Select(x =>
                 {
@@ -178,6 +170,14 @@ namespace CoachAssistent.Managers
                 .Include(m => m.User)
                 .Where(m => m.GroupId.Equals(groupId))
                 .Select(m => new SelectViewModel(m.UserId, m.User!.UserName));
+        }
+
+        public async Task<GroupMinimalViewModel> GetGroupMinimal(Guid id)
+        {
+            Group group = await dbContext.Groups
+                .SingleAsync(g => g.Id.Equals(id));
+
+            return mapper.Map<GroupMinimalViewModel>(group);
         }
     }
 }

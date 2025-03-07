@@ -12,15 +12,10 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public abstract class BaseManager
+    public abstract class BaseManager(CoachAssistentDbContext context, IMapper _mapper)
     {
-        internal readonly CoachAssistentDbContext dbContext;
-        internal readonly IMapper mapper;
-        public BaseManager(CoachAssistentDbContext context, IMapper _mapper)
-        {
-            dbContext = context;
-            mapper = _mapper;
-        }
+        internal readonly CoachAssistentDbContext dbContext = context;
+        internal readonly IMapper mapper = _mapper;
 
         internal async Task RequestGroupAccess(MembershipRequestViewModel request)
         {
@@ -37,6 +32,18 @@ namespace CoachAssistent.Managers
                     RequestTimestamp = DateTime.Now
                 };
                 await dbContext.MembershipRequests.AddAsync(membershipRequest);
+
+                IQueryable<Guid> administrators = dbContext.Members
+                    .Where(m => m.GroupId.Equals(request.GroupId) && m.RoleId.Equals(SeedingLibrary.AdminId))
+                    .Select(m => m.UserId);
+                await dbContext.Notifications.AddRangeAsync(administrators.Select(a => new Notification
+                {
+                    FromUserId = request.UserId,
+                    ToUserId = a,
+                    GroupId = request.GroupId,
+                    NotificationType = NotificationType.MembershipRequest,
+                    SentDateTime = DateTime.Now
+                }));
             }
             await dbContext.SaveChangesAsync();
         }

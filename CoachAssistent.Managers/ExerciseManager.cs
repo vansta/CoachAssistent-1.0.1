@@ -11,15 +11,10 @@ using Microsoft.Extensions.Configuration;
 
 namespace CoachAssistent.Managers
 {
-    public class ExerciseManager : BaseAuthenticatedManager
+    public class ExerciseManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, mapper, configuration, authenticationWrapper)
     {
-        readonly IConfiguration configuration;
-        
-        public ExerciseManager(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) 
-            : base(context, mapper, configuration, authenticationWrapper)
-        {
-            this.configuration = configuration;
-        }
+        readonly IConfiguration configuration = configuration;
+
         public OverviewViewModel<ExerciseOverviewItemViewModel> GetExercises(BaseSearchViewModel search)
         {
             IQueryable<Exercise> exercises = dbContext.Exercises
@@ -64,7 +59,7 @@ namespace CoachAssistent.Managers
                     SharingLevel = viewModel.SharingLevel,
                     Level = viewModel.Level,
                     Editors = CondenseEditors(viewModel.Editors),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Create, authenticationWrapper.UserId) },
+                    HistoryLogs = new List<HistoryLog> { new(EditActionType.Create, authenticationWrapper.UserId) },
                     ShareablesXGroups = CondenseGroups(viewModel.GroupIds)
                 }
             };
@@ -105,7 +100,7 @@ namespace CoachAssistent.Managers
                     Level = exercise.Shareable!.Level,
                     SharingLevel = SharingLevel.Public,
                     Editors = CondenseEditors(null),
-                    HistoryLogs = new List<HistoryLog> { new HistoryLog(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) },
+                    HistoryLogs = new List<HistoryLog> { new(EditActionType.Copy, authenticationWrapper.UserId, exercise.ShareableId) },
                     ShareablesXGroups = CondenseGroups(null)
                 },
                 Attachments = exercise.Attachments.Select(a => new Attachment

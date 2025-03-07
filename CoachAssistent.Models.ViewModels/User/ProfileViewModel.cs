@@ -19,6 +19,7 @@ namespace CoachAssistent.Models.ViewModels.User
         public DateTime CreationDate { get; set; }
 
         public Guid LicenseId { get; set; }
-        public List<MembershipOverviewItemViewModel> Memberships { get; set; } = new List<MembershipOverviewItemViewModel>();
+        public List<MembershipOverviewItemViewModel> Memberships { get; set; } = [];
+        public List<string> Tags { get; set; } = [];
     }
 }

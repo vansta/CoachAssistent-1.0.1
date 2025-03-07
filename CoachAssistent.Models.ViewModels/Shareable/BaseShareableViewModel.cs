@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.ViewModels.Shareable
 {
-    public class BaseShareableViewModel : BaseAbilityViewModel
+    public class BaseShareableViewModel() : BaseAbilityViewModel("shareable")
     {
-        public BaseShareableViewModel() : base ("shareable")
-        {
-
-        }
         public Guid ShareableId { get; set; }
         public string SharingLevel { get; set; } = null!;
         public string Level { get; set; } = null!;

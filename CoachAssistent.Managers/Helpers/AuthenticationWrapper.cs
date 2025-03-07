@@ -8,13 +8,9 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers.Helpers
 {
-    public class AuthenticationWrapper : IAuthenticationWrapper
+    public class AuthenticationWrapper(IHttpContextAccessor contextAccessor) : IAuthenticationWrapper
     {
-        readonly IHttpContextAccessor _contextAccessor;
-        public AuthenticationWrapper(IHttpContextAccessor contextAccessor)
-        {
-            _contextAccessor = contextAccessor;
-        }
+        readonly IHttpContextAccessor _contextAccessor = contextAccessor;
 
         public Guid UserId => _contextAccessor.UserId();
         public Guid LicenseId => _contextAccessor.LicenseId();

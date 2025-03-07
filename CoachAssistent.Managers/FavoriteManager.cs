@@ -12,12 +12,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Managers
 {
-    public class FavoriteManager : BaseAuthenticatedManager
+    public class FavoriteManager(CoachAssistentDbContext context, IMapper _mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : BaseAuthenticatedManager(context, _mapper, configuration, authenticationWrapper)
     {
-        public FavoriteManager(CoachAssistentDbContext context, IMapper _mapper, IConfiguration configuration, IAuthenticationWrapper authenticationWrapper) : base(context, _mapper, configuration, authenticationWrapper)
-        {
-        }
-
         public async Task SetFavorite(Guid shareableId)
         {
             Favorite? favorite = await dbContext.Favorites

@@ -9,12 +9,8 @@ using System.Threading.Tasks;
 
 namespace CoachAssistent.Models.ViewModels.Role
 {
-    public class RoleOverviewItemViewModel : BaseAbilityViewModel
+    public class RoleOverviewItemViewModel() : BaseAbilityViewModel("role")
     {
-        public RoleOverviewItemViewModel() : base ("role")
-        {
-
-        }
         public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }

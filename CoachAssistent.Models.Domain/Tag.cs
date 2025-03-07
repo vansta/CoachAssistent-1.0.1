@@ -21,5 +21,6 @@ namespace CoachAssistent.Models.Domain
         public ICollection<Segment> Segments { get; set; } = new HashSet<Segment>();
         public ICollection<Exercise> Exercises { get; set; } = new HashSet<Exercise>();
         public ICollection<Training> Trainings { get; set; } = new HashSet<Training>();
+        public ICollection<User> Users { get; set; } = new HashSet<User>();
     }
 }

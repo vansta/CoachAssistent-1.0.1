@@ -8,13 +8,10 @@ namespace CoachAssistent.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AttachmentController : ControllerBase
+    public class AttachmentController(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration) : ControllerBase
     {
-        readonly AttachmentManager attachmentManager;
-        public AttachmentController(CoachAssistentDbContext context, IMapper mapper, IConfiguration configuration)
-        {
-            attachmentManager = new AttachmentManager(context, mapper, configuration);
-        }
+        readonly AttachmentManager attachmentManager = new(context, mapper, configuration);
+
         [HttpGet]
         public async Task<FileContentResult> GetAttachment(Guid id)
         {

@@ -274,6 +274,70 @@ namespace CoachAssistent.Data.Migrations
                     b.ToTable("MembershipRequests");
                 });
 
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("FromUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("NotificationType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReadDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("SentDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("ShareableId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ToUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("GroupId");
+
+                    b.HasIndex("ShareableId");
+
+                    b.HasIndex("ToUserId");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.PasswordResetRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("RequestDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ResetDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetRequests");
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.Permissions.LicensePermission", b =>
                 {
                     b.Property<int>("Id")
@@ -1144,6 +1208,21 @@ namespace CoachAssistent.Data.Migrations
                     b.ToTable("TagTraining");
                 });
 
+            modelBuilder.Entity("TagUser", b =>
+                {
+                    b.Property<int>("TagsId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TagsId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("TagUser");
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.Attachment", b =>
                 {
                     b.HasOne("CoachAssistent.Models.Domain.Exercise", "Exercise")
@@ -1278,6 +1357,48 @@ namespace CoachAssistent.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Group");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.Notification", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.User", "FromUser")
+                        .WithMany("NotificationsFrom")
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId");
+
+                    b.HasOne("CoachAssistent.Models.Domain.Shareable", "Shareable")
+                        .WithMany()
+                        .HasForeignKey("ShareableId");
+
+                    b.HasOne("CoachAssistent.Models.Domain.User", "ToUser")
+                        .WithMany("NotificationsTo")
+                        .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("FromUser");
+
+                    b.Navigation("Group");
+
+                    b.Navigation("Shareable");
+
+                    b.Navigation("ToUser");
+                });
+
+            modelBuilder.Entity("CoachAssistent.Models.Domain.PasswordResetRequest", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -1531,6 +1652,21 @@ namespace CoachAssistent.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TagUser", b =>
+                {
+                    b.HasOne("CoachAssistent.Models.Domain.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoachAssistent.Models.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CoachAssistent.Models.Domain.Exercise", b =>
                 {
                     b.Navigation("Attachments");
@@ -1611,6 +1747,10 @@ namespace CoachAssistent.Data.Migrations
                     b.Navigation("MembershipRequests");
 
                     b.Navigation("Memberships");
+
+                    b.Navigation("NotificationsFrom");
+
+                    b.Navigation("NotificationsTo");
                 });
 #pragma warning restore 612, 618
         }
